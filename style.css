@@ -1,0 +1,59 @@
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: "PingFang SC", "Microsoft YaHei", "Segoe UI", sans-serif;
+  background: #f6f8fa;
+  color: #2c3e50;
+  line-height: 1.8;
+}
+
+main {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 48px 20px 60px;
+}
+
+/* 书目条目 */
+.item {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 1px 6px rgba(0,0,0,.05);
+  padding: 22px 26px;
+  margin-bottom: 20px;
+}
+.item .row {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.item a {
+  color: #2c6e9e;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1.08rem;
+}
+.item a:hover { text-decoration: underline; }
+.item a small {
+  font-weight: normal;
+  font-size: .8rem;
+  color: #95a5a6;
+}
+.item .desc {
+  color: #5d6d7e;
+  font-size: .92rem;
+  margin-top: 8px;
+}
+
+/* 组标题 */
+.group-title {
+  font-size: 1.2rem;
+  color: #2c6e9e;
+  margin-bottom: 18px;
+}
+.group-title span {
+  font-size: .85rem;
+  font-weight: normal;
+  color: #95a5a6;
+}
+
