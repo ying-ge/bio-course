@@ -50,14 +50,14 @@ const COURSE_FILES = [
   },
   {
     lesson: "参考书",
-    title: "人类的由来及性选择（The Descent of Man）",
+    title: "The Descent of Man, and Selection in Relation to Sex",
     file: "The Descent of Man (Charles Darwin).pdf",
     type: "pdf",
     desc: "达尔文 1871 年发表的《人类的由来及性选择》（1874 年第二版），首次系统地把进化论应用于人类：论证人类源自低等祖先、讨论人类种族的差异，并以大量篇幅阐述性选择理论。原版影印 PDF。"
   },
   {
     lesson: "参考书",
-    title: "人类在自然界的位置（Evidence as to Man's Place in Nature）",
+    title: "Evidence as to Man's Place in Nature",
     file: "Evidence as to Man’s Place in Nature (Thomas Henry Huxley).pdf",
     type: "pdf",
     desc: "赫胥黎 1863 年的名著（剑桥图书馆典藏影印版）。作为达尔文进化论最坚定的支持者，赫胥黎以比较解剖学和胚胎学证据论证人与类人猿的亲缘关系，书中著名的“人猿同祖”论战直接回应了当时对进化论的争议。"
