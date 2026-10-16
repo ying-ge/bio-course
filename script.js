@@ -27,7 +27,7 @@ COURSE_FILES.forEach(f => {
   a.href = hrefOf(f);
   a.textContent = f.title;
   const tag = document.createElement("small");
-  tag.textContent = f.type === "link" ? "外部链接" : "EPUB";
+  tag.textContent = f.type === "link" ? "外部链接" : f.type.toUpperCase();
   a.appendChild(tag);
   if (f.type === "link") a.target = "_blank";
   else a.setAttribute("download", "");

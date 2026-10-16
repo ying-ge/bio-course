@@ -47,5 +47,26 @@ const COURSE_FILES = [
     file: "The Zoology of the voyage of H.M.S. Beagle [Vol. 3 of 5] (Charles Darwin).epub",
     type: "epub",
     desc: "贝格尔号航行动物志（全五卷之第三卷，鸟类部分），由达尔文提供笔记、专家执笔描述的官方考察报告，收录大量物种描述与分布记录。适合对生物地理学、鸟类学或科学史感兴趣的同学查阅原始材料。"
+  },
+  {
+    lesson: "参考书",
+    title: "人类的由来及性选择（The Descent of Man）",
+    file: "The Descent of Man (Charles Darwin).pdf",
+    type: "pdf",
+    desc: "达尔文 1871 年发表的《人类的由来及性选择》（1874 年第二版），首次系统地把进化论应用于人类：论证人类源自低等祖先、讨论人类种族的差异，并以大量篇幅阐述性选择理论。原版影印 PDF。"
+  },
+  {
+    lesson: "参考书",
+    title: "人类在自然界的位置（Evidence as to Man's Place in Nature）",
+    file: "Evidence as to Man’s Place in Nature (Thomas Henry Huxley).pdf",
+    type: "pdf",
+    desc: "赫胥黎 1863 年的名著（剑桥图书馆典藏影印版）。作为达尔文进化论最坚定的支持者，赫胥黎以比较解剖学和胚胎学证据论证人与类人猿的亲缘关系，书中著名的“人猿同祖”论战直接回应了当时对进化论的争议。"
+  },
+  {
+    lesson: "参考书",
+    title: "科学元典套装（五册合订）",
+    file: "《基因论》 《人类的由来及性选择》 《人类与动物心理学讲义》 《人类在自然界的位置》《人类和动物的表情》.epub",
+    type: "epub",
+    desc: "五部科学经典的中译合订本，除达尔文的《人类的由来及性选择》《人类和动物的表情》外，还包括：摩尔根《基因论》（经典遗传学的奠基之作）、赫胥黎《人类在自然界的位置》（全译本）、冯特《人类与动物心理学讲义》（科学心理学的开山讲演）。"
   }
 ];
