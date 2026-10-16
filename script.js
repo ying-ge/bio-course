@@ -15,6 +15,10 @@ if (groups.length > 0) {
   h.className = "group-title";
   h.innerHTML = `${groups[0]} <span>（点击书名即可下载）</span>`;
   box.appendChild(h);
+  const note = document.createElement("p");
+  note.className = "sort-note";
+  note.textContent = "书目按原版首次出版时间排序，中文译本紧随其原版。";
+  box.appendChild(note);
 }
 
 COURSE_FILES.forEach(f => {

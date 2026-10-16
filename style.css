@@ -56,4 +56,9 @@ main {
   font-weight: normal;
   color: #95a5a6;
 }
+.sort-note {
+  color: #95a5a6;
+  font-size: .88rem;
+  margin: -8px 0 18px;
+}
 
