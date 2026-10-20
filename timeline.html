@@ -50,6 +50,14 @@
                           color: #9a9488; pointer-events: none; }
   #densityInner .bin.active .y { color: #111; font-weight: 700; }
 
+  /* 可视区间统计（密度条上方） */
+  #viewStats { position: absolute; left: 14px; bottom: 50px; z-index: 6;
+               padding: 5px 12px; font-size: 12.5px; color: #555;
+               background: rgba(255,255,255,.92); border: 1px solid #e5e2da;
+               border-radius: 14px; box-shadow: 0 1px 4px rgba(0,0,0,.08);
+               white-space: nowrap; }
+  #viewStats b { color: #7F5AF0; font-weight: 700; }
+
   #timeline { position: relative; height: 100%; width: 17000px; }
 
   /* 主轴 */
@@ -135,6 +143,7 @@
 <div id="densityBar"><span class="dlabel">事件密度 · 20年/格 · 点击某格缩放到该段</span><div id="densityInner"></div></div>
 </div>
 <button id="resetBtn" title="重置为全景视图">⤢ 重置视图</button>
+<div id="viewStats">可视区间 <b>—</b> · 事件 <b>—</b></div>
 <div class="hint" id="hint">先看全景 → 滚轮缩放（zoom in）→ 放大后按住拖动平移，鼠标悬停事件点查看详情</div>
 
 <script>
@@ -414,6 +423,19 @@ function clamp(v, lo, hi){ return v < lo ? lo : (v > hi ? hi : v); }
 function apply(){
   stage.style.transform = `translate(${view.tx}px, ${view.ty}px) scale(${view.s})`;
   highlightDensity();
+  updateStats();
+}
+
+// 更新可视区间与事件数量统计
+function updateStats(){
+  const [y0, y1] = currentYears();
+  const y0c = Math.max(1665, Math.round(y0));
+  const y1c = Math.min(2026, Math.round(y1));
+  const cnt = EVENTS.filter(ev => ev.y >= y0 && ev.y <= y1).length;
+  const st = document.getElementById('viewStats');
+  if (st) {
+    st.innerHTML = `可视区间 <b>${y0c}–${y1c}</b> · 事件 <b>${cnt}</b>`;
+  }
 }
 
 // 当前视口覆盖的年份范围
