@@ -43,10 +43,12 @@
   #densityBar .dlabel { flex: 0 0 auto; display: flex; align-items: center;
                         font-size: 12px; color: #999; padding: 0 12px; white-space: nowrap; }
   #densityInner { flex: 1 1 auto; position: relative; height: 100%; }
-  #densityInner .bin { position: absolute; top: 0; height: 100%; cursor: pointer;
-                       transition: filter .15s, box-shadow .15s; border-radius: 2px; }
-  #densityInner .bin:hover { filter: brightness(1.12); }
-  #densityInner .bin.active { box-shadow: inset 0 0 0 2px #222; filter: brightness(1.18); }
+  #densityInner .bin { position: absolute; top: 0; height: 100%; cursor: pointer; }
+  #densityInner .bin:hover { filter: brightness(1.08); }
+  #densityInner .bin .y { position: absolute; bottom: 3px; left: 50%;
+                          transform: translateX(-50%); font-size: 9px;
+                          color: #9a9488; pointer-events: none; }
+  #densityInner .bin.active .y { color: #111; font-weight: 700; }
 
   #timeline { position: relative; height: 100%; width: 17000px; }
 
@@ -233,6 +235,7 @@ for (const [a, b, label] of ERAS) {
   const bins = {};
   EVENTS.forEach(ev => { const b = Math.floor(ev.y / 20) * 20; bins[b] = (bins[b] || 0) + 1; });
   const maxD = Math.max(...Object.values(bins));
+  window._density = { bins, maxD };   // 供高亮函数复用
   const di = document.getElementById("densityInner");
   const Y0 = 1660, Y1 = 2040;   // 密度谱年份范围（首格起点 ~ 末格终点）
   for (let b = 1660; b <= 2020; b += 20) {
@@ -247,8 +250,13 @@ for (const [a, b, label] of ERAS) {
       blk.style.background = `hsl(26, 66%, ${L}%)`;
       blk.title = `${b}–${b + 19}：${n} 个事件（点击缩放到此）`;
     } else {
+      blk.style.background = "#eeeae3";   // 无事件：浅灰底色
       blk.title = `${b}–${b + 19}：无事件（点击缩放到此）`;
     }
+    const yl = document.createElement("span");
+    yl.className = "y";
+    yl.textContent = b;
+    blk.appendChild(yl);
     blk.addEventListener("click", () => zoomToEra(b));
     di.appendChild(blk);
   }
@@ -417,12 +425,21 @@ function currentYears(){
   return [y0, y1];
 }
 
-// 高亮当前视口覆盖的密度谱格
+// 高亮当前视口覆盖的密度谱格（直接加深背景色，不依赖 filter）
 function highlightDensity(){
   const [y0, y1] = currentYears();
+  const { bins, maxD } = window._density;
   document.querySelectorAll('#densityInner .bin').forEach(bin => {
     const b = +bin.dataset.year;
-    bin.classList.toggle('active', (b + 20 >= y0 && b <= y1));
+    const active = (b + 20 >= y0 && b <= y1);
+    bin.classList.toggle('active', active);
+    const n = bins[b] || 0;
+    if (n > 0) {
+      const base = 92 - (n / maxD) * 40;
+      bin.style.background = `hsl(26, 66%, ${active ? base - 9 : base}%)`;
+    } else {
+      bin.style.background = active ? "#dcd6ca" : "#eeeae3";
+    }
   });
 }
 
