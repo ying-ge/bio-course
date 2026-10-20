@@ -30,11 +30,22 @@
   #stage { position: absolute; left: 0; top: 0; width: 17000px; height: 100%;
            transform-origin: 0 0; will-change: transform; }
 
-  #resetBtn { position: fixed; right: 20px; bottom: 20px; z-index: 60;
+  #resetBtn { position: fixed; right: 20px; bottom: 64px; z-index: 60;
               padding: 8px 14px; font-size: 13px; border: 1px solid #c9c5bd;
               border-radius: 20px; background: #fff; color: #555; cursor: pointer;
               box-shadow: 0 2px 8px rgba(0,0,0,.12); }
   #resetBtn:hover { background: #efede8; }
+
+  /* 事件密度谱（固定高度，不随缩放变细；横向与时间线对齐） */
+  #densityBar { position: absolute; left: 0; right: 0; bottom: 0; height: 46px;
+                overflow: hidden; background: var(--bg); border-top: 1px solid #e5e2da;
+                z-index: 5; }
+  #densityBar .dlabel { position: absolute; left: 14px; top: 0; height: 46px;
+                        display: flex; align-items: center; font-size: 12px; color: #999;
+                        background: var(--bg); padding-right: 12px; z-index: 2; }
+  #densityInner { position: absolute; left: 0; top: 0; height: 46px; width: 17000px;
+                  transform-origin: 0 0; }
+  #densityInner .bin { position: absolute; top: 0; height: 100%; }
 
   #timeline { position: relative; height: 100%; width: 17000px; }
 
@@ -42,8 +53,8 @@
   .axis { position: absolute; left: 0; right: 0; top: 45%; height: 3px;
           background: #555; border-radius: 2px; }
   /* 世纪刻度 */
-  .tick { position: absolute; top: calc(47.5% - 7px); width: 1.5px; height: 17px; background: #999; }
-  .tick-label { position: absolute; top: calc(47.5% + 16px); transform: translateX(-50%);
+  .tick { position: absolute; top: calc(45% - 7px); width: 1.5px; height: 17px; background: #999; }
+  .tick-label { position: absolute; top: calc(45% + 16px); transform: translateX(-50%);
                 font-size: 14px; color: #888; }
   /* 时代分区 */
   .era { position: absolute; top: 2px; font-size: 15px; color: #8a8578;
@@ -117,7 +128,9 @@
   <span><i style="background:var(--frontier)"></i>前沿技术</span>
 </div>
 
-<div id="viewport"><div id="stage"><div id="timeline"><div class="axis"></div></div></div></div>
+<div id="viewport"><div id="stage"><div id="timeline"><div class="axis"></div></div></div>
+<div id="densityBar"><span class="dlabel">事件密度 · 20年/格 · 色越深越密集</span><div id="densityInner"></div></div>
+</div>
 <button id="resetBtn" title="重置为全景视图">⤢ 重置视图</button>
 <div class="hint" id="hint">先看全景 → 滚轮缩放（zoom in）→ 放大后按住拖动平移，鼠标悬停事件点查看详情</div>
 
@@ -213,6 +226,27 @@ for (const [a, b, label] of ERAS) {
   if (x(b) - x(a) < 220) e.style.display = "none";
   e.textContent = label; tl.appendChild(e);
 }
+
+// 事件密度谱：按 20 年分桶，颜色越深越密集（空桶透明=无事件）
+(function density(){
+  const bins = {};
+  EVENTS.forEach(ev => { const b = Math.floor(ev.y / 20) * 20; bins[b] = (bins[b] || 0) + 1; });
+  const maxD = Math.max(...Object.values(bins));
+  const di = document.getElementById("densityInner");
+  for (let b = 1660; b <= 2020; b += 20) {
+    const n = bins[b] || 0;
+    const blk = document.createElement("div");
+    blk.className = "bin";
+    blk.style.left = x(b) + "px";
+    blk.style.width = (x(b + 20) - x(b) - 1) + "px";
+    if (n > 0) {
+      const L = 92 - (n / maxD) * 40;   // 密度1≈89%浅橙，密度12≈52%深橙
+      blk.style.background = `hsl(26, 66%, ${L}%)`;
+      blk.title = `${b}–${b + 19}：${n} 个事件`;
+    }
+    di.appendChild(blk);
+  }
+})();
 
 // 布局：两侧行分配器——按年份顺序，轮流试上侧/下侧，放入“行的右边界放得下”的最浅行
 const CARD_W = 210, GAP = 160;   // 卡宽与最小水平净间距（卡间不重叠）
@@ -363,7 +397,12 @@ const stage = document.getElementById("stage");
 let view = { s: 1, tx: 0, ty: 0 };
 let minScale = 0.05;
 function clamp(v, lo, hi){ return v < lo ? lo : (v > hi ? hi : v); }
-function apply(){ stage.style.transform = `translate(${view.tx}px, ${view.ty}px) scale(${view.s})`; }
+function apply(){
+  stage.style.transform = `translate(${view.tx}px, ${view.ty}px) scale(${view.s})`;
+  // 密度谱只横向跟随，高度固定不缩放
+  const di = document.getElementById("densityInner");
+  if (di) di.style.transform = `translate(${view.tx}px, 0) scaleX(${view.s})`;
+}
 
 // 初始/重置：全景视图（横向 fit 全部 1665–2026）
 function fitToView(){
