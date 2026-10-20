@@ -468,12 +468,31 @@ function highlightDensity(){
 // 点击密度谱某格：缩放至该时间段（该 20 年占视口约 62%，垂直居中）
 function zoomToEra(b){
   const w20 = x(b + 20) - x(b);
-  const targetS = (vp.clientWidth * 0.62) / w20;
-  view.s = clamp(targetS, minScale, 3.5);
+  const targetS = clamp((vp.clientWidth * 0.62) / w20, minScale, 3.5);
   const yc = b + 10;
-  view.tx = vp.clientWidth / 2 - x(yc) * view.s;
-  view.ty = vp.clientHeight * 0.5 - vp.clientHeight * 0.45 * view.s;
-  apply();
+  const targetTx = vp.clientWidth / 2 - x(yc) * targetS;
+  const targetTy = vp.clientHeight * 0.5 - vp.clientHeight * 0.45 * targetS;
+  animateView(targetS, targetTx, targetTy);
+}
+
+// 缓动动画：从当前 view 平滑过渡到目标（easeInOutCubic）
+let animId = null;
+function animateView(ts, ttx, tty, dur = 700){
+  if (animId) cancelAnimationFrame(animId);
+  const s0 = view.s, tx0 = view.tx, ty0 = view.ty;
+  const t0 = performance.now();
+  const ease = t => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+  const step = now => {
+    const k = Math.min(1, (now - t0) / dur);
+    const e = ease(k);
+    view.s = s0 + (ts - s0) * e;
+    view.tx = tx0 + (ttx - tx0) * e;
+    view.ty = ty0 + (tty - ty0) * e;
+    apply();
+    if (k < 1) animId = requestAnimationFrame(step);
+    else animId = null;
+  };
+  animId = requestAnimationFrame(step);
 }
 
 // 初始/重置：全景视图（横向 fit 全部 1665–2026）
@@ -491,6 +510,7 @@ document.getElementById("resetBtn").addEventListener("click", fitToView);
 
 // 滚轮缩放（以鼠标位置为焦点）
 vp.addEventListener("wheel", e => {
+  if (animId) { cancelAnimationFrame(animId); animId = null; }
   e.preventDefault();
   const f = Math.exp(-e.deltaY * 0.0015);
   const ns = clamp(view.s * f, minScale, 3.5);
@@ -504,6 +524,7 @@ vp.addEventListener("wheel", e => {
 // 拖动平移
 let dragging = false, sx = 0, sy = 0, oTx = 0, oTy = 0, moved = false;
 vp.addEventListener("mousedown", e => {
+  if (animId) { cancelAnimationFrame(animId); animId = null; }
   dragging = true; moved = false;
   sx = e.clientX; sy = e.clientY; oTx = view.tx; oTy = view.ty;
   vp.classList.add("dragging");
