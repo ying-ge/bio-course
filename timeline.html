@@ -36,16 +36,17 @@
               box-shadow: 0 2px 8px rgba(0,0,0,.12); }
   #resetBtn:hover { background: #efede8; }
 
-  /* 事件密度谱（固定高度，不随缩放变细；横向与时间线对齐） */
+  /* 事件密度谱（固定宽度导航条：始终显示完整全景，点击某格缩放至该段） */
   #densityBar { position: absolute; left: 0; right: 0; bottom: 0; height: 46px;
-                overflow: hidden; background: var(--bg); border-top: 1px solid #e5e2da;
-                z-index: 5; }
-  #densityBar .dlabel { position: absolute; left: 14px; top: 0; height: 46px;
-                        display: flex; align-items: center; font-size: 12px; color: #999;
-                        background: var(--bg); padding-right: 12px; z-index: 2; }
-  #densityInner { position: absolute; left: 0; top: 0; height: 46px; width: 17000px;
-                  transform-origin: 0 0; }
-  #densityInner .bin { position: absolute; top: 0; height: 100%; }
+                background: var(--bg); border-top: 1px solid #e5e2da; z-index: 5;
+                display: flex; }
+  #densityBar .dlabel { flex: 0 0 auto; display: flex; align-items: center;
+                        font-size: 12px; color: #999; padding: 0 12px; white-space: nowrap; }
+  #densityInner { flex: 1 1 auto; position: relative; height: 100%; }
+  #densityInner .bin { position: absolute; top: 0; height: 100%; cursor: pointer;
+                       transition: filter .15s, box-shadow .15s; border-radius: 2px; }
+  #densityInner .bin:hover { filter: brightness(1.12); }
+  #densityInner .bin.active { box-shadow: inset 0 0 0 2px #222; filter: brightness(1.18); }
 
   #timeline { position: relative; height: 100%; width: 17000px; }
 
@@ -129,7 +130,7 @@
 </div>
 
 <div id="viewport"><div id="stage"><div id="timeline"><div class="axis"></div></div></div>
-<div id="densityBar"><span class="dlabel">事件密度 · 20年/格 · 色越深越密集</span><div id="densityInner"></div></div>
+<div id="densityBar"><span class="dlabel">事件密度 · 20年/格 · 点击某格缩放到该段</span><div id="densityInner"></div></div>
 </div>
 <button id="resetBtn" title="重置为全景视图">⤢ 重置视图</button>
 <div class="hint" id="hint">先看全景 → 滚轮缩放（zoom in）→ 放大后按住拖动平移，鼠标悬停事件点查看详情</div>
@@ -227,23 +228,28 @@ for (const [a, b, label] of ERAS) {
   e.textContent = label; tl.appendChild(e);
 }
 
-// 事件密度谱：按 20 年分桶，颜色越深越密集（空桶透明=无事件）
+// 事件密度谱：固定宽度导航条，每 20 年一格，点击某格缩放至该段
 (function density(){
   const bins = {};
   EVENTS.forEach(ev => { const b = Math.floor(ev.y / 20) * 20; bins[b] = (bins[b] || 0) + 1; });
   const maxD = Math.max(...Object.values(bins));
   const di = document.getElementById("densityInner");
+  const Y0 = 1660, Y1 = 2040;   // 密度谱年份范围（首格起点 ~ 末格终点）
   for (let b = 1660; b <= 2020; b += 20) {
     const n = bins[b] || 0;
     const blk = document.createElement("div");
     blk.className = "bin";
-    blk.style.left = x(b) + "px";
-    blk.style.width = (x(b + 20) - x(b) - 1) + "px";
+    blk.dataset.year = b;
+    blk.style.left = ((b - Y0) / (Y1 - Y0) * 100) + "%";
+    blk.style.width = ((20 / (Y1 - Y0) * 100) - 0.5) + "%";
     if (n > 0) {
-      const L = 92 - (n / maxD) * 40;   // 密度1≈89%浅橙，密度12≈52%深橙
+      const L = 92 - (n / maxD) * 40;   // 密度1≈浅橙，密度12≈深橙
       blk.style.background = `hsl(26, 66%, ${L}%)`;
-      blk.title = `${b}–${b + 19}：${n} 个事件`;
+      blk.title = `${b}–${b + 19}：${n} 个事件（点击缩放到此）`;
+    } else {
+      blk.title = `${b}–${b + 19}：无事件（点击缩放到此）`;
     }
+    blk.addEventListener("click", () => zoomToEra(b));
     di.appendChild(blk);
   }
 })();
@@ -399,9 +405,36 @@ let minScale = 0.05;
 function clamp(v, lo, hi){ return v < lo ? lo : (v > hi ? hi : v); }
 function apply(){
   stage.style.transform = `translate(${view.tx}px, ${view.ty}px) scale(${view.s})`;
-  // 密度谱只横向跟随，高度固定不缩放
-  const di = document.getElementById("densityInner");
-  if (di) di.style.transform = `translate(${view.tx}px, 0) scaleX(${view.s})`;
+  highlightDensity();
+}
+
+// 当前视口覆盖的年份范围
+function currentYears(){
+  const cx0 = (0 - view.tx) / view.s;                    // 视口左边缘在画布上的 x
+  const cx1 = (vp.clientWidth - view.tx) / view.s;       // 视口右边缘在画布上的 x
+  const y0 = T0 + (cx0 - PAD_L) / (W - PAD_L - PAD_R) * (T1 - T0);
+  const y1 = T0 + (cx1 - PAD_L) / (W - PAD_L - PAD_R) * (T1 - T0);
+  return [y0, y1];
+}
+
+// 高亮当前视口覆盖的密度谱格
+function highlightDensity(){
+  const [y0, y1] = currentYears();
+  document.querySelectorAll('#densityInner .bin').forEach(bin => {
+    const b = +bin.dataset.year;
+    bin.classList.toggle('active', (b + 20 >= y0 && b <= y1));
+  });
+}
+
+// 点击密度谱某格：缩放至该时间段（该 20 年占视口约 62%，垂直居中）
+function zoomToEra(b){
+  const w20 = x(b + 20) - x(b);
+  const targetS = (vp.clientWidth * 0.62) / w20;
+  view.s = clamp(targetS, minScale, 3.5);
+  const yc = b + 10;
+  view.tx = vp.clientWidth / 2 - x(yc) * view.s;
+  view.ty = vp.clientHeight * 0.5 - vp.clientHeight * 0.45 * view.s;
+  apply();
 }
 
 // 初始/重置：全景视图（横向 fit 全部 1665–2026）
