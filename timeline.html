@@ -449,7 +449,8 @@ function tourStart(sel) {
 function tourGoTo(i) {
   const els = [...document.querySelectorAll(tour ? tour.sel : '.event[data-q]')];
   if (!els.length) return tourStop();
-  if (i >= els.length) return tourStop();   // 走完全程
+  if (i >= els.length) i = 0;   // 走完全程后循环播放
+  if (i < 0) i = els.length - 1;
   tour = { i, timer: 0, sel: tour ? tour.sel : '.event[data-q]' };
   const el = els[i];
   const left = parseFloat(el.style.left);
