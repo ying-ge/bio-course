@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>生物学发现时间线 · 1665–2026（交互版）</title>
+<title>生物学发现时间线 · 1859–2026（交互版）</title>
 <style>
   :root {
     --evolution: #6A994E; --genetics: #BC4749; --molecule: #2A6F97;
@@ -35,9 +35,29 @@
               border-radius: 20px; background: #fff; color: #555; cursor: pointer;
               box-shadow: 0 2px 8px rgba(0,0,0,.12); }
   #resetBtn:hover { background: #efede8; }
+  #tourBtn { position: fixed; right: 20px; bottom: 184px; z-index: 60;
+             padding: 8px 14px; font-size: 13px; border: 1px solid #c9c5bd;
+             border-radius: 20px; background: #fff; color: #555; cursor: pointer;
+             box-shadow: 0 2px 8px rgba(0,0,0,.12); }
+  #tourBtn:hover { background: #efede8; }
+  #tourBtn.active { background: #3E5B32; border-color: #3E5B32; color: #fff; font-weight: 700; }
+  #qFilterBtn { position: fixed; right: 20px; bottom: 104px; z-index: 60;
+                padding: 8px 14px; font-size: 13px; border: 1px solid #c9c5bd;
+                border-radius: 20px; background: #fff; color: #555; cursor: pointer;
+                box-shadow: 0 2px 8px rgba(0,0,0,.12); }
+  #qFilterBtn:hover { background: #efede8; }
+  #qFilterBtn.active { background: #EEF3EA; border-color: #A9C39A; color: #3E5B32; font-weight: 700; }
+  #allTourBtn { position: fixed; right: 20px; bottom: 224px; z-index: 60;
+                padding: 8px 14px; font-size: 13px; border: 1px solid #c9c5bd;
+                border-radius: 20px; background: #fff; color: #555; cursor: pointer;
+                box-shadow: 0 2px 8px rgba(0,0,0,.12); }
+  #allTourBtn:hover { background: #efede8; }
+  #allTourBtn.active { background: #2A6F97; border-color: #2A6F97; color: #fff; font-weight: 700; }
+  /* 筛选开启时隐藏无对应标记的事件 */
+  body.q-only .event:not([data-q]) { display: none !important; }
 
   /* 事件密度谱（固定宽度导航条：始终显示完整全景，点击某格缩放至该段） */
-  #densityBar { position: absolute; left: 0; right: 0; bottom: 0; height: 46px;
+  #densityBar { position: absolute; left: 0; right: 0; bottom: 0; height: 28px;
                 background: var(--bg); border-top: 1px solid #e5e2da; z-index: 5;
                 display: flex; }
   #densityBar .dlabel { flex: 0 0 auto; display: flex; align-items: center;
@@ -46,8 +66,11 @@
   #densityInner .bin { position: absolute; top: 0; height: 100%; cursor: pointer; }
   #densityInner .bin:hover { filter: brightness(1.08); }
   #densityInner .bin .y { position: absolute; bottom: 3px; left: 50%;
-                          transform: translateX(-50%); font-size: 9px;
+                          transform: translateX(-50%); font-size: 15px; font-weight: 600;
                           color: #9a9488; pointer-events: none; }
+  @media (max-width: 900px)  { #densityInner .bin .y { font-size: 12px; } }
+  @media (max-width: 600px)  { #densityInner .bin .y { font-size: 10px; } }
+  @media (max-width: 400px)  { #densityInner .bin .y { font-size: 8px; } }
   #densityInner .bin.active .y { color: #111; font-weight: 700; }
 
   /* 可视区间统计（密度条上方） */
@@ -58,30 +81,28 @@
                white-space: nowrap; }
   #viewStats b { color: #7F5AF0; font-weight: 700; }
 
-  #timeline { position: relative; height: 100%; width: 17000px; }
+  #timeline { position: relative; top: 64px; height: calc(100% - 64px); width: 17000px; }
 
   /* 主轴 */
-  .axis { position: absolute; left: 0; right: 0; top: 45%; height: 3px;
+  .axis { position: absolute; left: 0; right: 0; top: 52%; height: 3px;
           background: #555; border-radius: 2px; }
   /* 世纪刻度 */
-  .tick { position: absolute; top: calc(45% - 7px); width: 1.5px; height: 17px; background: #999; }
-  .tick-label { position: absolute; top: calc(45% + 16px); transform: translateX(-50%);
+  .tick { position: absolute; top: calc(52% - 7px); width: 1.5px; height: 17px; background: #999; }
+  .tick-label { position: absolute; top: calc(52% + 16px); transform: translateX(-50%);
                 font-size: 14px; color: #888; }
-  /* 时代分区 */
-  .era { position: absolute; top: 2px; font-size: 15px; color: #8a8578;
-         border-left: 2px solid #d8d4ca; padding-left: 8px; white-space: nowrap; }
+/* 时代分区（已移除，不再显示） */
 
   /* 事件节点 */
-  .event { position: absolute; transform: translateX(-50%); width: 200px;
+  .event { position: absolute; transform: translateX(-50%); width: 420px;
            transition: transform .18s ease, z-index 0s; }
   .event .stem { position: absolute; left: 50%; width: 2.5px; background: currentColor; }
   .event .dot  { position: absolute; left: 50%; transform: translate(-50%, -50%);
                  border-radius: 50%; background: currentColor; border: 2px solid #fff;
                  box-shadow: 0 1px 3px rgba(0,0,0,.25); transition: all .18s ease; }
   .event .card { position: absolute; left: 50%; transform: translateX(-50%);
-                 width: 200px; text-align: center; transition: all .18s ease; }
-  .event .name { font-size: 14px; font-weight: 600; line-height: 1.35; }
-  .event .meta { font-size: 11px; color: #888; margin-top: 2px; }
+                 width: 420px; text-align: center; transition: all .18s ease; }
+  .event .name { font-size: 32px; font-weight: 600; line-height: 1.35; }
+  .event .meta { font-size: 22px; color: #888; margin-top: 3px; }
   .event.up    { color: inherit; }
   .event.up .card { bottom: calc(100% - 50%); margin-bottom: 14px; }
   .event.up .stem { bottom: 50%; }
@@ -91,33 +112,49 @@
   /* 悬停放大：卡与点整体上浮/下沉放大 */
   .event:hover { z-index: 50; }
   .event:hover .dot { transform: translate(-50%, -50%) scale(1.7); }
-  .event:hover .name { font-size: 18px; }
-  .event:hover .meta { font-size: 14px; color: #555; }
+  .event:hover .name { font-size: 36px; }
+  .event:hover .meta { font-size: 25px; color: #555; }
   .event.up:hover .card { margin-bottom: 22px; }
   .event.dn:hover .card { margin-top: 22px; }
 
   /* 悬停详情气泡 */
-  #detailTip { position: fixed; width: 300px; padding: 12px 14px;
+  #detailTip { position: fixed; width: 560px; max-width: calc(100vw - 24px);
+                   max-height: calc(100vh - 90px); overflow-y: auto;
+                   padding: 16px 18px;
                    background: #fff; border-radius: 10px;
                    box-shadow: 0 8px 30px rgba(0,0,0,.18); border-top: 4px solid currentColor;
                    display: none; z-index: 999;
-                   text-align: left; font-size: 14px; line-height: 1.7;
+                   opacity: 0; transition: opacity .35s ease; }
+  #detailTip.show { opacity: 1; }
+                   text-align: left; font-size: 28px; line-height: 1.75;
                    color: #222; }
   .event:hover .detail { opacity: 1; }
-  .detail h3 { font-size: 16px; margin-bottom: 4px; }
-  .detail .who { color: #999; font-size: 12.5px; margin-bottom: 6px; }
+  .detail h3 { font-size: 36px; margin-bottom: 6px; }
+  .detail h3 a { color: inherit; text-decoration: none; }
+  .detail h3 a:hover { text-decoration: underline; }
+  .detail .who { color: #999; font-size: 23px; margin-bottom: 8px; }
+  .detail .who a { color: #2A6F97; text-decoration: none; border-bottom: 1px dotted #2A6F97; }
+  .detail .who a:hover { text-decoration: underline; }
+  .detail .darwinq { margin: 2px 0 10px; padding: 10px 12px; background: #EEF3EA;
+                 border: 1px solid #A9C39A; border-radius: 8px; font-size: 26px;
+                 line-height: 1.6; color: #3E5B32; }
+  .detail .darwinq .qtag { display: block; font-weight: 700; color: #4F7A3F; font-size: 21px; margin-bottom: 2px; }
+  .detail .darwinq.q2 { background: #F0EDF8; border-color: #A99CC3; color: #3D3560; }
+  .detail .darwinq.q2 .qtag { color: #5B4F8A; }
   .detail p { color: #444; }
-  .detail .gossip { margin-top: 8px; padding: 8px 10px; background: #FBF6EC;
-                 border: 1px dashed #D4B996; border-radius: 8px; font-size: 13px;
+  .detail .evimg { display: block; width: 60%; margin: 12px auto 0; border-radius: 8px;
+                 border: 1px solid #e5e2da; background: #fff; }
+  .detail .gossip { margin-top: 10px; padding: 10px 12px; background: #FBF6EC;
+                 border: 1px dashed #D4B996; border-radius: 8px; font-size: 25px;
                  line-height: 1.65; color: #6B5B3E; }
-  .detail .gossip .gtag { font-weight: 700; color: #B08430; font-size: 12.5px; margin-bottom: 3px; }
-  .detail .src { margin-top: 8px; padding-top: 8px; border-top: 1px dashed #ddd;
-                 font-size: 12.5px; color: #999; }
+  .detail .gossip .gtag { font-weight: 700; color: #B08430; font-size: 21px; margin-bottom: 3px; }
+  .detail .src { margin-top: 10px; padding-top: 10px; border-top: 1px dashed #ddd;
+                 font-size: 21px; color: #999; }
   .detail .src a { color: #2A6F97; text-decoration: none; }
   .detail .src a:hover { text-decoration: underline; }
 
   /* 提示条 */
-  .hint { position: fixed; bottom: 14px; left: 50%; transform: translateX(-50%);
+  .hint { position: fixed; bottom: 36px; left: 50%; transform: translateX(-50%);
           background: rgba(40,40,40,.82); color: #fff; font-size: 13.5px;
           padding: 7px 16px; border-radius: 18px; pointer-events: none;
           transition: opacity .5s; }
@@ -126,8 +163,8 @@
 <body>
 
 <header>
-  <h1>生物学发现时间线 · 1665–2026</h1>
-  <p>📖 标记 = 藏有科学八卦（人物恩怨/命运转折/偶然发现）　|　从胡克的细胞到 AlphaFold：细胞与遗传时代 → 《物种起源》之后 → 编辑与 AI 前沿　|　拖动或滚轮横向滑动 · 悬停查看详情</p>
+  <h1>生物学发现时间线 · 1859–2026</h1>
+  <p>📖 = 藏有科学八卦（人物恩怨/命运转折/偶然发现）　🧭 = 达尔文之问（回答他当年无法解答的问题）　🔭 = 时空之旅新问（穿越途中见识新知后继续追问）　|　拖动或滚轮横向滑动 · 悬停查看详情</p>
 </header>
 
 <div class="legend">
@@ -142,6 +179,9 @@
 <div id="viewport"><div id="stage"><div id="timeline"><div class="axis"></div></div></div>
 <div id="densityBar"><span class="dlabel">事件密度 · 20年/格 · 点击某格缩放到该段</span><div id="densityInner"></div></div>
 </div>
+<button id="allTourBtn" title="自动导览：按时间顺序飞往每一个事件">▶ 时空之旅</button>
+<button id="tourBtn" title="自动导览：按顺序飞往各达尔文之问事件">▶ 达尔文之旅</button>
+<button id="qFilterBtn" title="只显示带🧭达尔文之问的事件">🧭 达尔文之问：关</button>
 <button id="resetBtn" title="重置为全景视图">⤢ 重置视图</button>
 <div id="viewStats">可视区间 <b>—</b> · 事件 <b>—</b></div>
 <div class="hint" id="hint">先看全景 → 滚轮缩放（zoom in）→ 放大后按住拖动平移，鼠标悬停事件点查看详情</div>
@@ -150,60 +190,65 @@
 // ===== 数据 =====
 // cat: cell细胞 / gen遗传 / mol分子 / evo演化 / div多样性 / fro前沿
 // lv:  1里程碑(大点粗干) / 2重要(小点细干)
+// q:   达尔文之问——本事件回答了他当年无法回答的问题
 const EVENTS = [
-// —— 前图：细胞与遗传时代 ——
-{y:1665, n:"显微镜下首次看到细胞", w:"罗伯特·胡克 Robert Hooke", c:"cell", lv:2, d:"胡克用自制复式显微镜观察软木栓，看到一个个小室，命名为 cell（小室）。这是人类第一次看到细胞——但看到的是死细胞的细胞壁。", wiki:"https://en.wikipedia.org/wiki/Robert_Hooke", wzh:"罗伯特·胡克", g:`胡克与列文虎克：名字像到让学生抓狂的两人是同龄人（相差3岁）。布商出身的列文虎克不会拉丁文、没上过大学，他把观察信件寄给皇家学会——审稿人正是胡克。学界起初不信'水里有微动物'，胡克1677年亲自复核并当众演示，为这位业余人士背书。后来两人却因磨镜方法保密问题交恶——列文虎克的绝技带进了坟墓，至今没人完全复原。`},
-{y:1674, n:"发现微生物世界", w:"安东尼·范·列文虎克 Antonie van Leeuwenhoek", c:"cell", lv:2, d:"列文虎克用自磨镜片的单式显微镜观察到雨水、池塘水中的原生动物、轮虫与细菌，打开了肉眼不可见的生命世界。他一生写给皇家学会的信件记录了数百种微生物。", wiki:"https://en.wikipedia.org/wiki/Antonie_van_Leeuwenhoek", wzh:"列文虎克"},
-{y:1838, n:"细胞学说（植物）", w:"马蒂亚斯·施莱登 Matthias Schleiden", c:"cell", lv:1, d:"施莱登提出植物体由细胞组成，细胞是植物体的基本结构单位。次年施万将其推广到动物，魏尔肖 1855 年补充'细胞来自细胞'（Omnis cellula e cellula），三句话构成完整细胞学说——生物学史上第一个大统一理论。", wiki:"https://en.wikipedia.org/wiki/Cell_theory", wzh:"细胞学说"},
-{y:1839, n:"细胞学说（动物）", w:"特奥多尔·施万 Theodor Schwann", c:"cell", lv:2, d:"施万将'一切生物由细胞组成'从植物推广到动物，证明动植物结构统一于细胞。细胞学说从此成为整个生命科学的基石。", wiki:"https://en.wikipedia.org/wiki/Theodor_Schwann", wzh:"特奥多尔·施万"},
-{y:1855, n:"细胞来自细胞", w:"鲁道夫·魏尔肖 Rudolf Virchow", c:"cell", lv:2, d:"魏尔肖提出'一切细胞来自已有细胞'，否定了自然发生说，为细胞病理学奠基。三段式细胞学说至此完整。", wiki:"https://en.wikipedia.org/wiki/Rudolf_Virchow", wzh:"魏尔肖"},
-{y:1859, n:"《物种起源》出版", w:"查尔斯·达尔文 Charles Darwin", c:"evo", lv:1, d:"11 月 24 日伦敦首发 1250 册当天售罄。以自然选择为核心的共同祖先学说，把林奈的分类树变成真实的家谱——两图在此交汇。", wiki:"https://en.wikipedia.org/wiki/On_the_Origin_of_Species", wzh:"物种起源", g:`达尔文收到华莱士从马来群岛寄来的论文，发现与自己压了20年的理论几乎相同，几乎精神崩溃。在朋友劝说下，1858年两人的论文被联合宣读——达尔文次年才匆匆出版《物种起源》。华莱士终生自认'达尔文的追随者'，并无怨言。`},
-{y:1831, n:"发现细胞核", w:"罗伯特·布朗 Robert Brown", c:"cell", lv:2, d:"布朗（后来以布朗运动闻名）在兰科植物表皮细胞中观察到细胞核并命名 nucleus。遗传物质的家在细胞学说成型前就已找到。", wiki:"https://en.wikipedia.org/wiki/Robert_Brown_(botanist,_born_1773)", wzh:"罗伯特·布朗"},
-{y:1865, n:"遗传定律（被埋没）", w:"格雷戈尔·孟德尔 Gregor Mendel", c:"gen", lv:1, d:"孟德尔在布尔诺自然学会宣读豌豆实验论文：分离定律与自由组合定律。此后 35 年无人问津——直到 1900 年三人独立重发现。达尔文至死不知孟德尔。", wiki:"https://en.wikipedia.org/wiki/Gregor_Mendel", wzh:"孟德尔", g:`孟德尔的论文重印本躺在达尔文书房里，据说页边还有记号，但两人从未通信——历史学家至今争论达尔文是否真的读懂了它。若他注意到'粒子遗传'，进化论可能提前30年补上机制。`},
-{y:1866, n:"海克尔系统树与生态学", w:"恩斯特·海克尔 Ernst Haeckel", c:"div", lv:2, d:"海克尔绘制通用系统发生树、创造'生态学'(Ökologie)一词，并把达尔文思想推向德国。'系统发生'概念从此与演化绑定。", wiki:"https://en.wikipedia.org/wiki/Ernst_Haeckel", wzh:"海克尔"},
-{y:1876, n:"发现细胞呼吸", w:"普费弗等", c:"cell", lv:2, d:"普费弗等开始用实验研究活细胞的呼吸与渗透，细胞生理学从描述走向定量。", wiki:"https://en.wikipedia.org/wiki/Cellular_respiration", wzh:"细胞呼吸"},
-{y:1897, n:"发现酶与发酵", w:"爱德华·毕希纳 Eduard Buchner", c:"cell", lv:2, d:"毕希纳用无细胞酵母汁实现糖发酵，证明发酵不需完整活细胞——'酿酶'的发现为酶学打开大门，他因此获 1907 年诺贝尔化学奖。", wiki:"https://en.wikipedia.org/wiki/Eduard_Buchner", wzh:"毕希纳"},
-{y:1898, n:"发现高尔基体", w:"卡米洛·高尔基 Camillo Golgi", c:"cell", lv:2, d:"高尔基用银染法在神经细胞内显示出网状细胞器，后来以他命名。细胞器的精细世界在 20 世纪电镜时代才真正展开。", wiki:"https://en.wikipedia.org/wiki/Golgi_apparatus", wzh:"高尔基体"},
-{y:1900, n:"孟德尔定律重发现", w:"德弗里斯 de Vries / 柯伦斯 Correns / 丘谢马克 Tschermak", c:"gen", lv:1, d:"三人各自独立实验后几乎同时读到孟德尔 1865 年论文，遗传学在此刻正式诞生——科学史上著名的'多重独立发现'。", wiki:"https://en.wikipedia.org/wiki/Mendelian_inheritance", wzh:"孟德尔定律"},
-{y:1902, n:"染色体与遗传的联系", w:"沃尔特·萨顿 Walter Sutton / 特奥多尔·鲍维里 Theodor Boveri", c:"gen", lv:2, d:"他们注意到减数分裂中染色体的行为与孟德尔因子完全平行，提出遗传的染色体学说——基因从此有了实体载体（还未命名）。", wiki:"https://en.wikipedia.org/wiki/Theodor_Boveri", wzh:"鲍维里"},
-{y:1908, n:"哈迪-温伯格平衡", w:"戈弗雷·哈迪 G. H. Hardy / 威廉·温伯格 Wilhelm Weinberg", c:"gen", lv:2, d:"数学家哈迪与医生温伯格各自证明：无选择、无漂变、随机交配下基因频率保持不变——群体遗传学的理论基石，也是今天 R 建树与中性理论的前奏。", wiki:"https://en.wikipedia.org/wiki/Hardy–Weinberg_principle", wzh:"哈代-温伯格定律"},
-{y:1910, n:"基因在染色体上", w:"托马斯·摩尔根 Thomas Hunt Morgan", c:"gen", lv:1, d:"摩尔根用果蝇白眼突变证明基因位于染色体上，并提出连锁与交换（遗传第三定律），1933 年获诺贝尔奖。基因从抽象符号变成染色体上的实体。", wiki:"https://en.wikipedia.org/wiki/Thomas_Hunt_Morgan", wzh:"摩尔根"},
-{y:1928, n:"转化现象", w:"弗雷德里克·格里菲斯 Frederick Griffith", c:"mol", lv:2, d:"格里菲斯发现死掉的致病型肺炎链球菌能把无毒菌株'转化'为有毒菌株——某种未知因子在细菌间传递遗传性状。", wiki:"https://en.wikipedia.org/wiki/Griffith_experiment", wzh:"格里菲斯实验"},
-{y:1937, n:"现代综合进化论", w:"费奥多西·杜布赞斯基 Theodosius Dobzhansky", c:"evo", lv:1, side:1, d:"《遗传学与物种起源》把群体遗传学与达尔文选择论融合：自然选择作用于种群内的等位基因频率——'达尔文+孟德尔'的现代综合运动由此启动，迈尔、赫胥黎、辛普森等相继完成。", wiki:"https://en.wikipedia.org/wiki/Modern_synthesis_(20th_century)", wzh:"现代综合进化论"},
-{y:1942, n:"物种的生物学概念", w:"恩斯特·迈尔 Ernst Mayr", c:"evo", lv:2, d:"迈尔系统提出以生殖隔离为核心的物种概念，并推动'现代综合'的动物学部分。物种不再只是形态相似，而是'实际上或潜在可相互交配的自然群体'。", wiki:"https://en.wikipedia.org/wiki/Ernst_Mayr", wzh:"恩斯特·迈尔"},
-{y:1944, n:"DNA 是遗传物质", w:"奥斯瓦尔德·艾弗里 Oswald Avery", c:"mol", lv:2, side:-1, d:"艾弗里等纯化肺炎链球菌的转化因子，证明是 DNA 而非蛋白质——但当时无人敢信，'如此单调的分子怎么携带遗传信息？'", wiki:"https://en.wikipedia.org/wiki/Avery–MacLeod–McCarty_experiment", wzh:"艾弗里-麦克劳德-麦卡蒂实验"},
-{y:1952, n:"噬菌体实验", w:"赫尔希 Hershey / 蔡斯 Chase", c:"mol", lv:2, d:"用放射性标记噬菌体的蛋白质与 DNA，只检测到 DNA 进入细菌——搅拌机实验一锤定音，1969 年获诺贝尔奖。", wiki:"https://en.wikipedia.org/wiki/Hershey–Chase_experiment", wzh:"赫尔希-蔡斯实验"},
-{y:1953, n:"DNA 双螺旋", w:"詹姆斯·沃森 James Watson / 弗朗西斯·克里克 Francis Crick", c:"mol", lv:1, d:"单页 Nature 论文，结构本身即暗示复制机制：'它没有逃过我们的眼睛……'。弗兰克林与威尔金斯的 X 射线衍射数据是关键证据。分子生物学时代从此开始。", wiki:"https://en.wikipedia.org/wiki/Double_helix", wzh:"DNA双螺旋结构", g:`Photo 51——那张揭示双螺旋的X射线衍射图，出自罗莎琳德·弗兰克林的实验室，被同事威尔金斯未经同意拿给沃森看。弗兰克林在1962年诺奖评审前死于卵巢癌（38岁），诺奖不授死者。沃森晚年回忆录对她多有贬损，直到近年才被正式正名。`},
-{y:1958, n:"半保留复制/中心法则", w:"梅塞尔森 Meselson / 斯塔尔 Stahl / 克里克 Crick", c:"mol", lv:2, d:"梅塞尔森-斯塔尔用重氮标记证明 DNA 半保留复制（'生物学最美的实验'）；克里克同年提出中心法则：DNA→RNA→蛋白质。", wiki:"https://en.wikipedia.org/wiki/Meselson–Stahl_experiment", wzh:"梅塞尔森-斯塔尔实验"},
-{y:1961, n:"操纵子模型", w:"弗朗索瓦·雅各布 François Jacob / 雅克·莫诺 Jacques Monod", c:"mol", lv:2, d:"乳糖操纵子揭示基因表达的开关机制——基因可被调控。mRNA 概念同年提出。1965 年诺贝尔奖。", wiki:"https://en.wikipedia.org/wiki/Lac_operon", wzh:"乳糖操纵子"},
-{y:1962, n:"叶绿体与线粒体起源", w:"早期内共生假说", c:"div", lv:2, d:"电镜与生化证据让'叶绿体、线粒体来自被吞噬的细菌'重新进入视野——为 1967 年马古利斯系统论证奠基。", wiki:"https://en.wikipedia.org/wiki/Endosymbiotic_theory", wzh:"内共生学说"},
-{y:1963, n:"分子钟假说", w:"埃玛纽埃·祖卡坎德尔 Emile Zuckerkandl / 莱纳斯·鲍林 Linus Pauling", c:"evo", lv:2, d:"比较不同物种血红蛋白氨基酸差异，发现差异量与物种分化时间成正比——分子演化速率恒定。今天建树与定年的理论基础。", wiki:"https://en.wikipedia.org/wiki/Molecular_clock", wzh:"分子钟"},
-{y:1965, n:"破解遗传密码", w:"马歇尔·尼伦伯格 Marshall Nirenberg / 哈尔·科拉纳 Har Gobind Khorana", c:"mol", lv:2, d:"尼伦伯格与马太用无细胞体系破译第一个密码子 UUU（苯丙氨酸），到 1966 年 64 个密码子全部破译——生命的信息表公之于世。", wiki:"https://en.wikipedia.org/wiki/Genetic_code", wzh:"遗传密码"},
-{y:1967, n:"内共生学说系统论证", w:"林恩·马古利斯 Lynn Margulis", c:"div", lv:2, d:"马古利斯（当时姓萨根）发表《有丝分裂细胞的起源》，系统论证真核细胞来自多次内共生——主流一度激烈反对，最终被分子证据证实。", wiki:"https://en.wikipedia.org/wiki/Lynn_Margulis", wzh:"林恩·马古利斯", g:`马古利斯的论文被期刊拒了约15次才发表；主流嘲笑'这是科幻小说'。她还是天文学家卡尔·萨根的第一任妻子——家里餐桌上的日常话题就是'你们身体里的细菌'。`},
-{y:1968, n:"中性进化理论", w:"木村资生 Motoo Kimura", c:"evo", lv:1, d:"木村提出分子水平的多数突变是中性或近中性的，固定靠随机漂变而非选择——'适者生存'在分子层面让位给'幸运者生存'。与选择论互补而非对立。", wiki:"https://en.wikipedia.org/wiki/Neutral_theory_of_molecular_evolution", wzh:"分子演化的中性理论"},
-{y:1970, n:"反转录酶", w:"霍华德·特明 Howard Temin / 戴维·巴尔的摩 David Baltimore", c:"mol", lv:2, d:"发现 RNA 肿瘤病毒能把 RNA 反转录为 DNA——中心法则被修正补充。1975 年诺贝尔奖，也为后来逆转录病毒研究（含 HIV）奠基。", wiki:"https://en.wikipedia.org/wiki/Reverse_transcriptase", wzh:"逆转录酶"},
-{y:1972, n:"限制酶与 DNA 重组", w:"保罗·伯格 Paul Berg / 斯坦利·科恩 Stanley Cohen / 赫伯特·博耶 Herbert Boyer", c:"mol", lv:2, d:"伯格完成首个体外重组 DNA；科恩与博耶 1973 年实现细菌克隆异源基因——遗传工程诞生，伯格 1980 年获诺贝尔化学奖。", wiki:"https://en.wikipedia.org/wiki/Paul_Berg", wzh:"保罗·伯格"},
-{y:1972, n:"间断平衡学说", w:"斯蒂芬·古尔德 Stephen Jay Gould / 奈尔斯·埃尔德雷奇 Niles Eldredge", c:"evo", lv:2, side:-1, d:"针对化石记录的'缺环'，提出物种长期停滞、在短时间内快速成种——演化速率不均匀的宏演化观，向达尔文渐进论的公开挑战与修正。", wiki:"https://en.wikipedia.org/wiki/Punctuated_equilibrium", wzh:"间断平衡"},
-{y:1975, n:"分子水平的自然选择", w:"约翰·梅纳德·史密斯 John Maynard Smith 等", c:"evo", lv:2, d:"针对中性理论，选择论者证明氨基酸位点普遍受选择约束；两派论战把群体遗传学推向成熟——今天我们知道：大部分突变中性，功能位点受选择。", wiki:"https://en.wikipedia.org/wiki/John_Maynard_Smith", wzh:"约翰·梅纳德·史密斯"},
-{y:1977, n:"DNA 测序时代开启", w:"弗雷德里克·桑格 Frederick Sanger / 沃尔特·吉尔伯特 Walter Gilbert", c:"mol", lv:1, d:"桑格的双脱氧链终止法与吉尔伯特的化学降解法同年发表，人类第一次能读出 DNA 的字母序列。两人与桑格共享 1980 年诺贝尔化学奖。", wiki:"https://en.wikipedia.org/wiki/Sanger_sequencing", wzh:"桑格测序法"},
-{y:1977, n:"三域学说", w:"卡尔·乌斯 Carl Woese / 乔治·福克斯 George Fox", c:"div", lv:1, d:"用 16S rRNA 序列比较发现：原核生物其实是两域——细菌与古菌亲缘遥远，真核生物与古菌更近。生命之树从'两界'改写为'三域'——你 R 建树课的分子证据源头。", wiki:"https://en.wikipedia.org/wiki/Carl_Woese", wzh:"卡尔·乌斯"},
-{y:1983, n:"PCR 发明", w:"凯利·穆利斯 Kary Mullis", c:"mol", lv:1, d:"在开车夜路上想到的idea：变性-退火-延伸的循环让 DNA 指数扩增。1993 年诺贝尔化学奖。此后任何生物学实验都离不开 PCR。", wiki:"https://en.wikipedia.org/wiki/Kary_Mullis", wzh:"凯利·穆利斯", g:`穆利斯自称灵感来自1970年代一个周五夜晚的公路之旅——开车去乡间小屋，蜿蜒山路上突然想通了指数扩增。他还宣称见过外星发光体、公开支持占星术——科学怪才与争议一身。`},
-{y:1985, n:"分子系统学革命", w:"PCR+rDNA 序列普及", c:"evo", lv:2, d:"PCR 与测序结合，用基因序列重建亲缘关系成为常规操作——形态学分类进入分子时代，'生命之树'项目启动。", wiki:"https://en.wikipedia.org/wiki/Molecular_phylogenetics", wzh:"分子系统发生学"},
-{y:1990, n:"人类基因组计划启动", w:"国际联盟（多国资助）", c:"mol", lv:1, d:"30 亿美元、13 年、六国协作，目标测出人类全部 30 亿碱基对——生物学史上最大的'大科学'工程，与曼哈顿计划、阿波罗计划并称。", wiki:"https://en.wikipedia.org/wiki/Human_Genome_Project", wzh:"人类基因组计划"},
-{y:1995, n:"首个完整基因组", w:"克雷格·文特尔 Craig Venter / 克莱尔·弗雷泽 Claire Fraser", c:"mol", lv:2, d:"流感嗜血杆菌基因组 183 万碱基对全部测序——第一个自由生活物种的完整生命蓝图，基因组学从口号变成现实。", wiki:"https://en.wikipedia.org/wiki/Craig_Venter", wzh:"克雷格·文特尔"},
-{y:2003, n:"人类基因组完成图", w:"国际联盟", c:"mol", lv:1, d:"HGP 提前两年完成。人类只有约 2 万个基因——比预期少得多；基因组的'暗物质'（非编码区）从此成为新前沿。", wiki:"https://en.wikipedia.org/wiki/Human_Genome_Project", wzh:"人类基因组计划"},
+// —— 前图：细胞与遗传时代（1665–1855 事件已移除，时间线自 1859《物种起源》起）——
+{y:1859, n:"《物种起源》出版", w:"查尔斯·达尔文 Charles Darwin", c:"evo", lv:1, q:"一切之旅的起点：自然选择与共同祖先", d:"11 月 24 日伦敦首发 1250 册当天售罄。以自然选择为核心的共同祖先学说，把林奈的分类树变成真实的家谱——两图在此交汇。", img:"https://thumb.wikimedia.org/wikipedia/commons/thumb/c/cd/Origin_of_Species_title_page.jpg/500px-Origin_of_Species_title_page.jpg", wiki:"https://en.wikipedia.org/wiki/On_the_Origin_of_Species", wikiW:"https://en.wikipedia.org/wiki/Charles_Darwin", wzh:"物种起源", g:`达尔文收到华莱士从马来群岛寄来的论文，发现与自己压了20年的理论几乎相同，几乎精神崩溃。在朋友劝说下，1858年两人的论文被联合宣读——达尔文次年才匆匆出版《物种起源》。华莱士终生自认'达尔文的追随者'，并无怨言。`},
+{y:1861, n:"始祖鸟化石", w:"赫尔曼·冯·迈耶 Hermann von Meyer", c:"evo", lv:1, q:"不同大类生物之间，是否存在过渡类型？", d:"《物种起源》出版仅两年，巴伐利亚石灰岩矿中出土兼具羽毛与爬行动物特征（长尾、有爪、有齿）的始祖鸟——达尔文预言的'中间类型'如期现身。后来中国辽宁的带羽毛恐龙化石进一步补全了鸟类起源的证据链。", img:"https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9d/Archaeopteryx_lithographica_%28Berlin_specimen%29.jpg/500px-Archaeopteryx_lithographica_%28Berlin_specimen%29.jpg", wiki:"https://en.wikipedia.org/wiki/Archaeopteryx", wikiW:"https://en.wikipedia.org/wiki/Hermann_von_Meyer", wzh:"始祖鸟", g:`达尔文在《物种起源》里坦承'没有发现的中间变种'是理论最大的软肋。始祖鸟标本恰恰在他最需要的时候出现——恩格斯说它是'爬行类向鸟类过渡的完美证据'，反对者则坚称它'要么是鸟要么是爬虫'，争论持续至今。`},
+{y:1865, n:"遗传定律（被埋没）", w:"格雷戈尔·孟德尔 Gregor Mendel", c:"gen", lv:1, q:"亲代的性状究竟怎样传给后代？", d:"孟德尔在布尔诺自然学会宣读豌豆实验论文：分离定律与自由组合定律。此后 35 年无人问津——直到 1900 年三人独立重发现。达尔文至死不知孟德尔。", img:"https://thumb.wikimedia.org/wikipedia/commons/thumb/b/ba/Gregor_Mendel_2.jpg/500px-Gregor_Mendel_2.jpg", wiki:"https://en.wikipedia.org/wiki/Mendelian_inheritance", wikiW:"https://en.wikipedia.org/wiki/Gregor_Mendel", wzh:"孟德尔", g:`孟德尔的论文重印本躺在达尔文书房里，据说页边还有记号，但两人从未通信——历史学家至今争论达尔文是否真的读懂了它。若他注意到'粒子遗传'，进化论可能提前30年补上机制。`},
+{y:1869, n:"发现'核素'（DNA）", w:"弗里德里希·米舍尔 Friedrich Miescher", c:"mol", lv:2, q:"遗传信息的化学本质是什么？", d:"米舍尔从脓细胞（手术绷带）中分离出一种只存在于细胞核中的酸性物质，命名为'核素'——后来知道这就是 DNA。当时没人想到这个'单调'的分子竟是遗传的主角。", img:"https://thumb.wikimedia.org/wikipedia/commons/thumb/b/bc/Friedrich_Miescher.jpg/500px-Friedrich_Miescher.jpg", wiki:"https://en.wikipedia.org/wiki/DNA", wikiW:"https://en.wikipedia.org/wiki/Friedrich_Miescher", wzh:"米舍尔"},
+{y:1879, n:"看见有丝分裂", w:"瓦尔特·弗莱明 Walther Flemming", c:"cell", lv:2, q:"遗传信息在细胞中以什么形式存在？", d:"弗莱明用苯胺染料染色，首次系统描述细胞分裂中'染色质'的纵裂与均分过程（有丝分裂）。1888 年瓦尔代尔将其命名为 chromosome（染色体）——遗传问题从此进入细胞内部寻找答案。", img:"https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2f/Animal_cell_cycle-en.svg/500px-Animal_cell_cycle-en.svg.png", wiki:"https://en.wikipedia.org/wiki/Mitosis", wikiW:"https://en.wikipedia.org/wiki/Walther_Flemming", wzh:"弗莱明"},
+{y:1866, n:"海克尔系统树与生态学", w:"恩斯特·海克尔 Ernst Haeckel", c:"div", lv:2, d:"海克尔绘制通用系统发生树、创造'生态学'(Ökologie)一词，并把达尔文思想推向德国。'系统发生'概念从此与演化绑定。", img:"https://thumb.wikimedia.org/wikipedia/commons/thumb/8/81/Ernst_Haeckel_5.jpg/500px-Ernst_Haeckel_5.jpg", wiki:"https://en.wikipedia.org/wiki/Phylogenetic_tree", wikiW:"https://en.wikipedia.org/wiki/Ernst_Haeckel", wzh:"海克尔"},
+{y:1876, n:"发现细胞呼吸", w:"普费弗等", c:"cell", lv:2, d:"普费弗等开始用实验研究活细胞的呼吸与渗透，细胞生理学从描述走向定量。", img:"https://thumb.wikimedia.org/wikipedia/commons/thumb/7/74/CellRespiration.svg/500px-CellRespiration.svg.png", wiki:"https://en.wikipedia.org/wiki/Cellular_respiration", wikiW:"https://en.wikipedia.org/wiki/Wilhelm_Pfeffer", wzh:"细胞呼吸"},
+{y:1897, n:"发现酶与发酵", w:"爱德华·毕希纳 Eduard Buchner", c:"cell", lv:2, d:"毕希纳用无细胞酵母汁实现糖发酵，证明发酵不需完整活细胞——'酿酶'的发现为酶学打开大门，他因此获 1907 年诺贝尔化学奖。", wiki:"https://en.wikipedia.org/wiki/Zymase", wikiW:"https://en.wikipedia.org/wiki/Eduard_Buchner", wzh:"毕希纳"},
+{y:1898, n:"发现高尔基体", w:"卡米洛·高尔基 Camillo Golgi", c:"cell", lv:2, d:"高尔基用银染法在神经细胞内显示出网状细胞器，后来以他命名。细胞器的精细世界在 20 世纪电镜时代才真正展开。", img:"https://thumb.wikimedia.org/wikipedia/commons/thumb/a/ad/XBio_illustration_%E2%80%93_Golgi_Apparatus.png/500px-XBio_illustration_%E2%80%93_Golgi_Apparatus.png", wiki:"https://en.wikipedia.org/wiki/Golgi_apparatus", wikiW:"https://en.wikipedia.org/wiki/Camillo_Golgi", wzh:"高尔基体"},
+{y:1900, n:"孟德尔定律重发现", w:"德弗里斯 de Vries / 柯伦斯 Correns / 丘谢马克 Tschermak", c:"gen", lv:1, q:"自然选择所依赖的性状如何遗传？", d:"三人各自独立实验后几乎同时读到孟德尔 1865 年论文，遗传学在此刻正式诞生——科学史上著名的'多重独立发现'。", img:"https://thumb.wikimedia.org/wikipedia/commons/thumb/d/dc/XBio_illustration_%E2%80%93_Mendelian_Inheritance.png/500px-XBio_illustration_%E2%80%93_Mendelian_Inheritance.png", wiki:"https://en.wikipedia.org/wiki/Mendelian_inheritance", wikiW:"https://en.wikipedia.org/wiki/Hugo_de_Vries", wzh:"孟德尔定律"},
+{y:1903, n:"突变与基因型概念", w:"德弗里斯 de Vries / 威廉·约翰森 Wilhelm Johannsen", c:"gen", lv:2, q:"自然选择所筛选的变异从哪里来？", d:"德弗里斯发表月见草突变研究，提出新性状可不连续地突然出现；约翰森 1909 年提出'基因型/表现型'术语，把遗传因子与可见性状分开。达尔文时代' blending inheritance 会抹平差异'的致命反对理由从此瓦解。", img:"https://thumb.wikimedia.org/wikipedia/commons/thumb/d/dc/Hugo_de_Vries_%281848-1935%29%2C_by_Th%C3%A9r%C3%A8se_Schwartze_%281851-1918%29.jpg/500px-Hugo_de_Vries_%281848-1935%29%2C_by_Th%C3%A9r%C3%A8se_Schwartze_%281851-1918%29.jpg", wiki:"https://en.wikipedia.org/wiki/Mutationism", wikiW:"https://en.wikipedia.org/wiki/Wilhelm_Johannsen", wzh:"突变论"},
+{y:1902, n:"染色体与遗传的联系", w:"沃尔特·萨顿 Walter Sutton / 特奥多尔·鲍维里 Theodor Boveri", c:"gen", lv:2, d:"他们注意到减数分裂中染色体的行为与孟德尔因子完全平行，提出遗传的染色体学说——基因从此有了实体载体（还未命名）。", img:"https://upload.wikimedia.org/wikipedia/commons/8/89/Theodor_boveri_walter_sutton.png", wiki:"https://en.wikipedia.org/wiki/Boveri%E2%80%93Sutton_chromosome_theory", wikiW:"https://en.wikipedia.org/wiki/Walter_Sutton_(geneticist)", wzh:"鲍维里"},
+{y:1908, n:"哈迪-温伯格平衡", w:"戈弗雷·哈迪 G. H. Hardy / 威廉·温伯格 Wilhelm Weinberg", c:"gen", lv:2, d:"数学家哈迪与医生温伯格各自证明：无选择、无漂变、随机交配下基因频率保持不变——群体遗传学的理论基石，也是今天 R 建树与中性理论的前奏。", img:"https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b2/Hardy-Weinberg.svg/500px-Hardy-Weinberg.svg.png", wiki:"https://en.wikipedia.org/wiki/Hardy%E2%80%93Weinberg_principle", wikiW:"https://en.wikipedia.org/wiki/G._H._Hardy", wzh:"哈代-温伯格定律"},
+{y:1910, n:"基因在染色体上", w:"托马斯·摩尔根 Thomas Hunt Morgan", c:"gen", lv:1, d:"摩尔根用果蝇白眼突变证明基因位于染色体上，并提出连锁与交换（遗传第三定律），1933 年获诺贝尔奖。基因从抽象符号变成染色体上的实体。", img:"https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8f/Thomas_Hunt_Morgan.jpg/500px-Thomas_Hunt_Morgan.jpg", wiki:"https://en.wikipedia.org/wiki/Genetic_linkage", wikiW:"https://en.wikipedia.org/wiki/Thomas_Hunt_Morgan", wzh:"摩尔根"},
+{y:1927, n:"X 射线人工诱变", w:"赫尔曼·穆勒 Hermann Muller", c:"gen", lv:2, q:"可遗传变异从哪里来？", d:"穆勒证明 X 射线可使果蝇突变率提高上百倍——变异并非凭空产生，物理/化学因素即可诱发。自然选择不创造变异，只筛选已有可遗传差异；突变与重组是变异之源。1946 年诺贝尔奖。", img:"https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b2/Brokechromo.jpg/500px-Brokechromo.jpg", wiki:"https://en.wikipedia.org/wiki/Mutagenesis", wikiW:"https://en.wikipedia.org/wiki/Hermann_Josef_Muller", wzh:"穆勒"},
+{y:1937, n:"现代综合进化论", w:"费奥多西·杜布赞斯基 Theodosius Dobzhansky", c:"evo", lv:1, side:1, d:"《遗传学与物种起源》把群体遗传学与达尔文选择论融合：自然选择作用于种群内的等位基因频率——'达尔文+孟德尔'的现代综合运动由此启动，迈尔、赫胥黎、辛普森等相继完成。", img:"https://thumb.wikimedia.org/wikipedia/commons/thumb/9/97/Modern_Synthesis.svg/500px-Modern_Synthesis.svg.png", wiki:"https://en.wikipedia.org/wiki/Modern_synthesis_(20th_century)", wikiW:"https://en.wikipedia.org/wiki/Theodosius_Dobzhansky", wzh:"现代综合进化论"},
+{y:1942, n:"物种的生物学概念", w:"恩斯特·迈尔 Ernst Mayr", c:"evo", lv:2, d:"迈尔系统提出以生殖隔离为核心的物种概念，并推动'现代综合'的动物学部分。物种不再只是形态相似，而是'实际上或潜在可相互交配的自然群体'。", img:"https://thumb.wikimedia.org/wikipedia/commons/thumb/a/af/Ernst_Mayr_PLoS.jpg/500px-Ernst_Mayr_PLoS.jpg", wiki:"https://en.wikipedia.org/wiki/Species_problem", wikiW:"https://en.wikipedia.org/wiki/Ernst_Mayr", wzh:"恩斯特·迈尔"},
+{y:1944, n:"DNA 是遗传物质", w:"奥斯瓦尔德·艾弗里 Oswald Avery", c:"mol", lv:2, side:-1, d:"艾弗里等纯化肺炎链球菌的转化因子，证明是 DNA 而非蛋白质——但当时无人敢信，'如此单调的分子怎么携带遗传信息？'", img:"https://thumb.wikimedia.org/wikipedia/commons/thumb/4/43/DNA_in_water.jpg/500px-DNA_in_water.jpg", wiki:"https://en.wikipedia.org/wiki/Avery%E2%80%93MacLeod%E2%80%93McCarty_experiment", wikiW:"https://en.wikipedia.org/wiki/Oswald_Avery", wzh:"艾弗里-麦克劳德-麦卡蒂实验"},
+{y:1952, n:"噬菌体实验", w:"赫尔希 Hershey / 蔡斯 Chase", c:"mol", lv:2, d:"用放射性标记噬菌体的蛋白质与 DNA，只检测到 DNA 进入细菌——搅拌机实验一锤定音，1969 年获诺贝尔奖。", img:"https://thumb.wikimedia.org/wikipedia/commons/thumb/3/32/Hershey_Chase_experiment.png/500px-Hershey_Chase_experiment.png", wiki:"https://en.wikipedia.org/wiki/Hershey%E2%80%93Chase_experiment", wikiW:"https://en.wikipedia.org/wiki/Alfred_Hershey", wzh:"赫尔希-蔡斯实验"},
+{y:1953, n:"DNA 双螺旋", w:"詹姆斯·沃森 James Watson / 弗朗西斯·克里克 Francis Crick", c:"mol", lv:1, q:"遗传信息的物质基础是什么？", d:"单页 Nature 论文，结构本身即暗示复制机制：'它没有逃过我们的眼睛……'。弗兰克林与威尔金斯的 X 射线衍射数据是关键证据。分子生物学时代从此开始。", img:"https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4c/DNA_Structure%2BKey%2BLabelled.pn_NoBB.png/500px-DNA_Structure%2BKey%2BLabelled.pn_NoBB.png", wiki:"https://en.wikipedia.org/wiki/DNA", wikiW:"https://en.wikipedia.org/wiki/James_Watson", wzh:"DNA双螺旋结构", g:`Photo 51——那张揭示双螺旋的X射线衍射图，出自罗莎琳德·弗兰克林的实验室，被同事威尔金斯未经同意拿给沃森看。弗兰克林在1962年诺奖评审前死于卵巢癌（38岁），诺奖不授死者。沃森晚年回忆录对她多有贬损，直到近年才被正式正名。`},
+{y:1953, n:"米勒-尤里实验", w:"斯坦利·米勒 Stanley Miller / 哈罗德·尤里 Harold Urey", c:"mol", lv:2, q:"生命最初是怎样产生的？（达尔文留白的问题）", d:"在烧瓶中模拟早期地球大气与闪电，一周内得到多种氨基酸——无机小分子可以自发形成生命的基础构件。但它并未创造生命：生命起源仍是科学未完全解决的难题，达尔文理论的边界正在于此。", img:"https://thumb.wikimedia.org/wikipedia/commons/thumb/5/54/Miller-Urey_experiment-en.svg/500px-Miller-Urey_experiment-en.svg.png", wiki:"https://en.wikipedia.org/wiki/Miller%E2%80%93Urey_experiment", wikiW:"https://en.wikipedia.org/wiki/Stanley_Miller_(chemist)", wzh:"米勒-尤里实验", g:`米勒做这个实验时还是研究生，导师尤里起初嫌'太像炼金术'。封存的实验装置在2010年代被重新打开分析——用现代质谱重新检测，当年样品里其实含有远多于当时认知的氨基酸种类。`},
+{y:1956, n:"地球年龄 45.5 亿年", w:"克莱尔·帕特森 Clair Patterson", c:"div", lv:1, q:"演化拥有足够漫长的时间吗？", d:"帕特森用陨石铅同位素定出地球年龄约 45.5 亿年——远超达尔文时代物理学家开尔文估计的几千万年。达尔文曾因'时间不够'被开尔文压得抬不起头；深时（deep time）的确认让渐变演化拥有充裕的舞台。", wiki:"https://en.wikipedia.org/wiki/Age_of_the_Earth", wikiW:"https://en.wikipedia.org/wiki/Clair_Cameron_Patterson", wzh:"地球年龄", g:`帕特森为测铅同位素造了世界上第一个超净实验室——因为他发现环境铅污染毁了所有样品。顺藤摸瓜他发现大气铅污染来自汽油添加剂，随后二十年单挑整个石油行业，最终推动全球无铅汽油。一个测地球年龄的人，顺便救了千万儿童的智商。`},
+{y:1958, n:"半保留复制/中心法则", w:"梅塞尔森 Meselson / 斯塔尔 Stahl / 克里克 Crick", c:"mol", lv:2, d:"梅塞尔森-斯塔尔用重氮标记证明 DNA 半保留复制（'生物学最美的实验'）；克里克同年提出中心法则：DNA→RNA→蛋白质。", img:"https://thumb.wikimedia.org/wikipedia/commons/thumb/a/a2/Meselson-stahl_experiment_diagram_en_chiral.svg/500px-Meselson-stahl_experiment_diagram_en_chiral.svg.png", wiki:"https://en.wikipedia.org/wiki/Meselson%E2%80%93Stahl_experiment", wikiW:"https://en.wikipedia.org/wiki/Matthew_Meselson", wzh:"梅塞尔森-斯塔尔实验"},
+{y:1961, n:"操纵子模型", w:"弗朗索瓦·雅各布 François Jacob / 雅克·莫诺 Jacques Monod", c:"mol", lv:2, d:"乳糖操纵子揭示基因表达的开关机制——基因可被调控。mRNA 概念同年提出。1965 年诺贝尔奖。", img:"https://thumb.wikimedia.org/wikipedia/commons/thumb/2/22/Lac_Operon.svg/500px-Lac_Operon.svg.png", wiki:"https://en.wikipedia.org/wiki/Lac_operon", wikiW:"https://en.wikipedia.org/wiki/Fran%C3%A7ois_Jacob", wzh:"乳糖操纵子"},
+{y:1962, n:"叶绿体与线粒体起源", w:"早期内共生假说", c:"div", lv:2, d:"电镜与生化证据让'叶绿体、线粒体来自被吞噬的细菌'重新进入视野——为 1967 年马古利斯系统论证奠基。", img:"https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e7/Symbiogenesis_2_mergers.svg/500px-Symbiogenesis_2_mergers.svg.png", wiki:"https://en.wikipedia.org/wiki/Symbiogenesis", wikiW:"https://en.wikipedia.org/wiki/Lynn_Margulis", wzh:"内共生学说"},
+{y:1963, n:"分子钟假说", w:"埃玛纽埃·祖卡坎德尔 Emile Zuckerkandl / 莱纳斯·鲍林 Linus Pauling", c:"evo", lv:2, d:"比较不同物种血红蛋白氨基酸差异，发现差异量与物种分化时间成正比——分子演化速率恒定。今天建树与定年的理论基础。", img:"https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3f/Molecular_evolution_bamboos.svg/500px-Molecular_evolution_bamboos.svg.png", wiki:"https://en.wikipedia.org/wiki/Molecular_clock", wikiW:"https://en.wikipedia.org/wiki/Emile_Zuckerkandl", wzh:"分子钟"},
+{y:1965, n:"破解遗传密码", w:"马歇尔·尼伦伯格 Marshall Nirenberg / 哈尔·科拉纳 Har Gobind Khorana", c:"mol", lv:2, d:"尼伦伯格与马太用无细胞体系破译第一个密码子 UUU（苯丙氨酸），到 1966 年 64 个密码子全部破译——生命的信息表公之于世。", img:"https://thumb.wikimedia.org/wikipedia/commons/thumb/c/ce/RNA-codons.svg/500px-RNA-codons.svg.png", wiki:"https://en.wikipedia.org/wiki/Genetic_code", wikiW:"https://en.wikipedia.org/wiki/Marshall_Nirenberg", wzh:"遗传密码"},
+{y:1967, n:"内共生学说系统论证", w:"林恩·马古利斯 Lynn Margulis", c:"div", lv:2, q:"复杂真核细胞是怎样形成的？", qt:2, d:"马古利斯（当时姓萨根）发表《有丝分裂细胞的起源》，系统论证真核细胞来自多次内共生——主流一度激烈反对，最终被分子证据证实。演化不只在物种层面，细胞本身就是演化的产物。", img:"https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e7/Symbiogenesis_2_mergers.svg/500px-Symbiogenesis_2_mergers.svg.png", wiki:"https://en.wikipedia.org/wiki/Symbiogenesis", wikiW:"https://en.wikipedia.org/wiki/Lynn_Margulis", wzh:"林恩·马古利斯", g:`马古利斯的论文被期刊拒了约15次才发表；主流嘲笑'这是科幻小说'。她还是天文学家卡尔·萨根的第一任妻子——家里餐桌上的日常话题就是'你们身体里的细菌'。`},
+{y:1968, n:"中性进化理论", w:"木村资生 Motoo Kimura", c:"evo", lv:1, d:"木村提出分子水平的多数突变是中性或近中性的，固定靠随机漂变而非选择——'适者生存'在分子层面让位给'幸运者生存'。与选择论互补而非对立。", img:"https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4a/Masatoshi_Nei_with_Motoo_Kimura_in_a_restaurant_in_1986.png/500px-Masatoshi_Nei_with_Motoo_Kimura_in_a_restaurant_in_1986.png", wiki:"https://en.wikipedia.org/wiki/Neutral_theory_of_molecular_evolution", wikiW:"https://en.wikipedia.org/wiki/Motoo_Kimura", wzh:"分子演化的中性理论"},
+{y:1970, n:"反转录酶", w:"霍华德·特明 Howard Temin / 戴维·巴尔的摩 David Baltimore", c:"mol", lv:2, d:"发现 RNA 肿瘤病毒能把 RNA 反转录为 DNA——中心法则被修正补充。1975 年诺贝尔奖，也为后来逆转录病毒研究（含 HIV）奠基。", img:"https://thumb.wikimedia.org/wikipedia/commons/thumb/a/ae/Reverse_transcriptase_3KLF_labels.png/500px-Reverse_transcriptase_3KLF_labels.png", wiki:"https://en.wikipedia.org/wiki/Reverse_transcriptase", wikiW:"https://en.wikipedia.org/wiki/Howard_Martin_Temin", wzh:"逆转录酶"},
+{y:1972, n:"限制酶与 DNA 重组", w:"保罗·伯格 Paul Berg / 斯坦利·科恩 Stanley Cohen / 赫伯特·博耶 Herbert Boyer", c:"mol", lv:2, d:"伯格完成首个体外重组 DNA；科恩与博耶 1973 年实现细菌克隆异源基因——遗传工程诞生，伯格 1980 年获诺贝尔化学奖。", img:"https://thumb.wikimedia.org/wikipedia/commons/thumb/0/01/Recombinant_formation_of_plasmids.svg/500px-Recominant_formation_of_plasmids.svg.png", wiki:"https://en.wikipedia.org/wiki/Recombinant_DNA", wikiW:"https://en.wikipedia.org/wiki/Paul_Berg", wzh:"保罗·伯格"},
+{y:1972, n:"间断平衡学说", w:"斯蒂芬·古尔德 Stephen Jay Gould / 奈尔斯·埃尔德雷奇 Niles Eldredge", c:"evo", lv:2, side:-1, d:"针对化石记录的'缺环'，提出物种长期停滞、在短时间内快速成种——演化速率不均匀的宏演化观，向达尔文渐进论的公开挑战与修正。", img:"https://thumb.wikimedia.org/wikipedia/commons/thumb/f/fc/PunctuatedEquilibrium.png/500px-PunctuatedEquilibrium.png", wiki:"https://en.wikipedia.org/wiki/Punctuated_equilibrium", wikiW:"https://en.wikipedia.org/wiki/Stephen_Jay_Gould", wzh:"间断平衡"},
+{y:1975, n:"分子水平的自然选择", w:"约翰·梅纳德·史密斯 John Maynard Smith 等", c:"evo", lv:2, d:"针对中性理论，选择论者证明氨基酸位点普遍受选择约束；两派论战把群体遗传学推向成熟——今天我们知道：大部分突变中性，功能位点受选择。", img:"https://thumb.wikimedia.org/wikipedia/commons/thumb/a/ac/Mutation_and_selection_diagram_%282%29.svg/500px-Mutation_and_selection_diagram_%282%29.svg.png", wiki:"https://en.wikipedia.org/wiki/Selection_(genetics)", wikiW:"https://en.wikipedia.org/wiki/John_Maynard_Smith", wzh:"约翰·梅纳德·史密斯"},
+{y:1977, n:"DNA 测序时代开启", w:"弗雷德里克·桑格 Frederick Sanger / 沃尔特·吉尔伯特 Walter Gilbert", c:"mol", lv:1, d:"桑格的双脱氧链终止法与吉尔伯特的化学降解法同年发表，人类第一次能读出 DNA 的字母序列。两人与桑格共享 1980 年诺贝尔化学奖。", img:"https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ef/Phylogenetic_tree_of_life_1990_LUCA.svg/500px-Phylogenetic_tree_of_life_1990_LUCA.svg.png", wiki:"https://en.wikipedia.org/wiki/Sanger_sequencing", wikiW:"https://en.wikipedia.org/wiki/Frederick_Sanger", wzh:"桑格测序法"},
+{y:1977, n:"三域学说", w:"卡尔·乌斯 Carl Woese / 乔治·福克斯 George Fox", c:"div", lv:1, q:"分子证据会怎样改变生命之树？", qt:2, d:"用 16S rRNA 序列比较发现：原核生物其实是两域——细菌与古菌亲缘遥远，真核生物与古菌更近。生命之树从'两界'改写为'三域'——你 R 建树课的分子证据源头。达尔文依据形态与地理推断的亲缘关系，第一次被独立分子证据全面重绘。", img:"https://thumb.wikimedia.org/wikipedia/commons/thumb/d/da/Carl_Woese.jpg/500px-Carl_Woese.jpg", wiki:"https://en.wikipedia.org/wiki/Three-domain_system", wikiW:"https://en.wikipedia.org/wiki/Carl_Woese", wzh:"卡尔·乌斯"},
+{y:1988, n:"Lenski 长期演化实验", w:"理查德·伦斯基 Richard Lenski", c:"evo", lv:1, q:"能否在实验室直接观察演化？", qt:2, d:"12 个大肠杆菌群体自 1988 年起每天传代、至今超过 7 万代——实验直接观察到适应性增长、突变率演变，甚至'重新进化'出利用柠檬酸的能力。演化不是历史故事，而是可实时记录、可重放（冻存祖先解冻比较）的过程。", img:"https://thumb.wikimedia.org/wikipedia/commons/thumb/9/99/Lenski%27s_12_long-term_lines_of_E._coli_on_25_June_2008.jpg/500px-Lenski%27s_12_long-term_lines_of_E._coli_on_25_June_2008.jpg", wiki:"https://en.wikipedia.org/wiki/E._coli_long-term_evolution_experiment", wikiW:"https://en.wikipedia.org/wiki/Richard_Lenski", wzh:"大肠杆菌长期演化实验", g:`Lenski 把每天的样品冻存在-80℃冰箱里——相当于给演化过程'存档'。发现柠檬酸利用突变后，他解冻祖先重放演化，证明该能力依赖此前的'铺垫突变'：历史偶然与必然在冰箱里共存。`},
+{y:1943, n:"抗生素耐药性的开端", w:"亚历山大·弗莱明 Alexander Fleming / 青霉素临床应用", c:"evo", lv:2, q:"为什么同一群体中，有些个体能在药物下存活？", d:"青霉素投用仅数年，医院便出现耐药金黄色葡萄球菌——不是细菌'变强'，而是药物筛选出了本就存在的耐药个体。差异性生存与繁殖：自然选择正在我们眼前发生，公共卫生与养殖业至今仍在为此付出演化代价。", img:"https://thumb.wikimedia.org/wikipedia/commons/thumb/9/99/Penicillin_core.svg/500px-Penicillin_core.svg.png", wiki:"https://en.wikipedia.org/wiki/Antimicrobial_resistance", wikiW:"https://en.wikipedia.org/wiki/Alexander_Fleming", wzh:"抗生素耐药性"},
+{y:1983, n:"PCR 发明", w:"凯利·穆利斯 Kary Mullis", c:"mol", lv:1, d:"在开车夜路上想到的idea：变性-退火-延伸的循环让 DNA 指数扩增。1993 年诺贝尔化学奖。此后任何生物学实验都离不开 PCR。", img:"https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b5/XBio_illustration_%E2%80%93_Polymerase_Chain_Reaction.png/500px-XBio_illustration_%E2%80%93_Polymerase_Chain_Reaction.png", wiki:"https://en.wikipedia.org/wiki/Polymerase_chain_reaction", wikiW:"https://en.wikipedia.org/wiki/Kary_Mullis", wzh:"凯利·穆利斯", g:`穆利斯自称灵感来自1970年代一个周五夜晚的公路之旅——开车去乡间小屋，蜿蜒山路上突然想通了指数扩增。他还宣称见过外星发光体、公开支持占星术——科学怪才与争议一身。`},
+{y:1985, n:"分子系统学革命", w:"PCR+rDNA 序列普及", c:"evo", lv:2, d:"PCR 与测序结合，用基因序列重建亲缘关系成为常规操作——形态学分类进入分子时代，'生命之树'项目启动。", img:"https://thumb.wikimedia.org/wikipedia/commons/thumb/6/6b/Five_Stages_of_Molecular_Phylogenetic_Analysis.png/500px-Five_Stages_of_Molecular_Phylogenetic_Analysis.png", wiki:"https://en.wikipedia.org/wiki/Molecular_phylogenetics", wikiW:"https://en.wikipedia.org/wiki/Carl_Woese", wzh:"分子系统发生学"},
+{y:1990, n:"人类基因组计划启动", w:"詹姆斯·沃森 James Watson（首任主任）/ 国际联盟", c:"mol", lv:1, d:"30 亿美元、13 年、六国协作，目标测出人类全部 30 亿碱基对——生物学史上最大的'大科学'工程，与曼哈顿计划、阿波罗计划并称。", img:"https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f3/Logo_HGP.jpg/500px-Logo_HGP.jpg", wiki:"https://en.wikipedia.org/wiki/Human_Genome_Project", wikiW:"https://en.wikipedia.org/wiki/James_Watson", wzh:"人类基因组计划"},
+{y:1995, n:"首个完整基因组", w:"克雷格·文特尔 Craig Venter / 克莱尔·弗雷泽 Claire Fraser", c:"mol", lv:2, d:"流感嗜血杆菌基因组 183 万碱基对全部测序——第一个自由生活物种的完整生命蓝图，基因组学从口号变成现实。", img:"https://thumb.wikimedia.org/wikipedia/commons/thumb/0/02/Haemophilus_influenzae.jpg/500px-Haemophilus_influenzae.jpg", wiki:"https://en.wikipedia.org/wiki/Haemophilus_influenzae", wikiW:"https://en.wikipedia.org/wiki/Craig_Venter", wzh:"克雷格·文特尔"},
+{y:2003, n:"人类基因组完成图", w:"弗朗西斯·柯林斯 Francis Collins / 国际联盟", c:"mol", lv:1, q:"能否在全基因组尺度比较遗传信息？", qt:2, d:"HGP 提前两年完成。人类只有约 2 万个基因——比预期少得多；基因组的'暗物质'（非编码区）从此成为新前沿。跨物种全基因组比较从此成为检验共同祖先的常规证据。", img:"https://thumb.wikimedia.org/wikipedia/commons/thumb/2/2e/Charles_Darwin_seated_crop.jpg/500px-Charles_Darwin_seated_crop.jpg", wiki:"https://en.wikipedia.org/wiki/Human_Genome_Project", wikiW:"https://en.wikipedia.org/wiki/Francis_Collins", wzh:"人类基因组计划"},
 // —— 后图：起源之后 ——
-{y:2005, n:"黑猩猩基因组", w:"国际联盟", c:"evo", lv:2, side:-1, d:"人与黑猩猩 DNA 差异仅约 1.2%——达尔文'人类源自非洲古猿'的预言被分子证据定量确认。演化生物学进入比较基因组学时代。", wiki:"https://en.wikipedia.org/wiki/Chimpanzee_genome_project", wzh:"黑猩猩基因组计划"},
- {y:2005, n:"光遗传学的诞生", w:"卡尔·戴塞尔罗斯 Karl Deisseroth / 爱德华·博伊登 Edward Boyden / 张锋 Feng Zhang", c:"fro", lv:1, side:1, d:"把绿藻的光敏蛋白 Channelrhodopsin-2 转入神经元，用一束蓝光在毫秒级控制神经活动——'用光开关大脑'成为现实，2026 年获诺贝尔生理学或医学奖。神经科学从'观察大脑'迈入'操控大脑'。", wiki:"https://en.wikipedia.org/wiki/Optogenetics", wzh:"光遗传学", g:`Deisseroth 是精神科医生出身——白天看病人、晚上在实验室想把'电路'直接装进大脑。最初的灵感来自绿藻：Nagel 2003 年发现 ChR2 是光门控通道，Deisseroth 的学生 Boyden 与张锋 2005 年第一次把它放进神经元。一篇论文，改变了整个神经科学的研究方式。`},
-{y:2010, n:"尼安德特人基因组", w:"斯万特·帕博 Svante Pääbo", c:"evo", lv:1, d:"从 4 万年化石骨头中提取古 DNA 测序：现代欧亚人群含 1-4% 尼安德特基因——不同人种曾杂交。古 DNA 学由此建立，帕博 2022 年获诺贝尔生理学或医学奖。", wiki:"https://en.wikipedia.org/wiki/Neanderthal_genome_project", wzh:"尼安德特人基因组计划", g:`帕博团队测序尼安德特人时，在西伯利亚一个山洞里随手测了一根指骨——结果发现一个全新人种'丹尼索瓦人'。一根指骨就是一个未知人种，古DNA领域的日常惊悚。`},
-{y:2012, n:"CRISPR 基因编辑", w:"詹妮弗·杜德娜 Jennifer Doudna / 埃玛纽埃勒·卡彭蒂耶 Emmanuelle Charpentier", c:"fro", lv:1, d:"把细菌的免疫系统改造成基因剪刀，可在任何基因组精确切割——2020 年诺贝尔化学奖。也带来深刻的伦理讨论（2018 年基因编辑婴儿事件）。", wiki:"https://en.wikipedia.org/wiki/CRISPR_gene_editing", wzh:"CRISPR基因编辑"},
-{y:2015, n:"eDNA 生物监测普及", w:"皮埃尔·塔贝莱 Pierre Taberlet 等", c:"div", lv:2, d:"从一杯河水/一撮土壤中提取环境 DNA 即可鉴定当地物种——生物多样性监测从'带枪进山'变为'取样测序'，保护生物学的方法革命。", wiki:"https://en.wikipedia.org/wiki/Environmental_DNA", wzh:"环境DNA"},
-{y:2020, n:"AlphaFold 破解折叠", w:"德米斯·哈萨比斯 Demis Hassabis / 约翰·朱默 John Jumper（DeepMind）", c:"fro", lv:1, d:"AI 预测 2 亿+蛋白质结构达到实验精度——困扰生物学 50 年的难题被深度学习解决，2024 年诺贝尔化学奖。AI×生物学的里程碑。", wiki:"https://en.wikipedia.org/wiki/AlphaFold", wzh:"AlphaFold"},
-{y:1993, n:"微RNA lin-4 的发现", w:"维克托·安布罗斯 Victor Ambros / 加里·鲁夫昆 Gary Ruvkun", c:"mol", lv:2, side:1, d:"在线虫中发现第一个微 RNA（lin-4）——不编码蛋白质的小 RNA 也能调控基因，开启转录后调控的全新层次。当时几乎无人理会，直到 2000 年 let-7 引爆全领域，2024 年获诺贝尔奖——一藏 31 年的诺奖。", wiki:"https://en.wikipedia.org/wiki/MicroRNA", wzh:"小分子RNA", g:`安布罗斯1993年发现lin-4时，几乎所有同行认为这是线虫的怪癖、不具普遍性——他因此在哈佛晋升受挫。鲁夫昆2000年发现第二个微RNA(let-7)才引爆全领域。两人从冷板凳到诺奖等了31年——比很多博士的整个职业生涯还长。`},
-{y:1995, n:"调节性 T 细胞的发现", w:"坂口志文 Shimon Sakaguchi / 布鲁科夫 Brunkow / 拉姆斯德尔 Ramsdell", c:"cell", lv:2, d:"鉴定出抑制免疫攻击的 CD25⁺调节性 T 细胞（2003 年 FOXP3 基因阐明其主控开关）——解释免疫系统为何不攻击自身，成为器官移植、自免病与肿瘤免疫的理论根基，2025 年获诺贝尔奖。", wiki:"https://en.wikipedia.org/wiki/Regulatory_T_cell", wzh:"调节T细胞"},
-{y:2025, n:"首例定制基因编辑救活婴儿 KJ", w:"CHOP / 宾大医学团队", c:"fro", lv:1, side:1, d:"患致命代谢病（CPS1 缺陷）的男婴 KJ 接受史上首个'为单个病人、单个突变定制'的碱基编辑疗法——从基因组诊断到给药仅约 6 个月，Science 2025 年度突破提名。人类第一次'按需'修复生命密码：1953 读懂双螺旋 → 2012 拿到剪刀 → 2025 为一个孩子现场磨一把。", wiki:"https://en.wikipedia.org/wiki/KJ_Muldoon", wzh:"KJ·穆尔东", g:`治疗由 30 多名医生、科学家、伦理学家和 FDA 官员组成的'一人军队'完成；父母在孕期超声发现异常后仅 10 周内就完成了确诊。与 2018 年贺建奎的生殖系编辑对照：同一种剪刀，体细胞治疗救命 vs 生殖系改造越界——一念之差，一药一罪。`},
-{y:2026, n:"AlphaGenome 解读非编码基因组", w:"Google DeepMind", c:"fro", lv:1, d:"DeepMind 发布 AlphaGenome，能从长 DNA 序列预测基因变异的调控效应，第一次大规模解读占基因组 98% 的'暗物质'——非编码区。AI 读懂生命的下一章：2020 AlphaFold 读蛋白质结构，2026 AlphaGenome 读基因调控开关。", wiki:"https://en.wikipedia.org/wiki/AlphaGenome", wzh:"AlphaGenome"},
- {y:2026, n:"RNA 聚合酶核酶自我复制", w:"贾尼 Gianni / 郭克 Kwok 等", c:"mol", lv:1, side:-1, d:"一个小的聚合酶核酶（ribozyme）能合成自己的互补链，也能合成自身拷贝——RNA 世界假说（生命起源第一步是能自我复制的 RNA）获得迄今最有力的实验支持。", wiki:"https://en.wikipedia.org/wiki/RNA_world", wzh:"RNA世界假说", g:`生命起源的'先有鸡还是先有蛋'：DNA 需要蛋白质来复制，蛋白质需要 DNA 来编码——破解之道是假设最早的生命用 RNA 同时干这两件事。此前最大的障碍是'RNA 能催化复制吗'，2026 年这个核酶第一次做到自我复制，相当于在试管里看到了生命起源的影子。`},
+{y:2004, n:"发现提塔利克鱼", w:"尼尔·舒宾 Neil Shubin 团队", c:"evo", lv:1, q:"能否根据演化假说预测在哪里找到过渡化石？", qt:2, d:"舒宾团队按演化预测——'鱼类向四足动物过渡的形态应出现在约 3.75 亿年前的淡水沉积'——在加拿大北极多轮勘察后挖出兼具鱼鳍与腕骨、颈关节特征的 Tiktaalik。演化理论不止解释过去，还能像物理学一样做出可检验的预测（2006 年 Nature 发表）。", img:"https://thumb.wikimedia.org/wikipedia/commons/thumb/f/fa/Tiktaalik_Chicago.JPG/500px-Tiktaalik_Chicago.JPG", wiki:"https://en.wikipedia.org/wiki/Tiktaalik", wikiW:"https://en.wikipedia.org/wiki/Neil_Shubin", wzh:"提塔利克鱼", g:`舒宾在《你身体里的鱼》里写道：找这条鱼先用了一本地质图集——先决定'去哪挖'，再花好几个夏天在北极零度露营。结果第一眼看到化石长颚时，团队知道'就是它'。教科书级的'预测—检验'现场。`},
+{y:1996, n:"带羽毛恐龙（中华龙鸟）", w:"季强 / 中国辽宁热河生物群", c:"evo", lv:1, q:"鸟类真的源自恐龙吗？（1861 始祖鸟之问的续集）", qt:2, d:"辽宁北票农民李荫芳挖出的一块化石被鉴定为'中华龙鸟'——一只披着原始绒羽的小型兽脚类恐龙。此后热河生物群接连出土尾羽龙、小盗龙、赫氏近鸟龙等带羽毛恐龙，把'鸟类源自恐龙'从假说变成证据链：1861 始祖鸟展示'鸟有爬行类特征'，1996 起的发现展示'恐龙有羽毛'。", img:"https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c5/Sinosauropteryxfossil.jpg/500px-Sinosauropteryxfossil.jpg", wiki:"https://en.wikipedia.org/wiki/Sinosauropteryx", wikiW:"https://en.wikipedia.org/wiki/Ji_Qiang_(paleontologist)", wzh:"中华龙鸟", g:`中华龙鸟先被当作'最古老的鸟'命名，后经研究确认为恐龙——'鸟'的名字留了下来，身份却反转，成了'名字叫鸟的恐龙'。更妙的是：其绒羽不用于飞行，而是保温/炫耀——羽毛的出现早于飞行，先有羽毛后有翅膀。化石农民李荫芳最初把标本卖给博物馆时，谁也没想到它会登上 Nature、震动世界。`},
+{y:2005, n:"黑猩猩基因组", w:"埃里克·兰德 Eric Lander / 国际联盟", c:"evo", lv:2, side:-1, d:"人与黑猩猩 DNA 差异仅约 1.2%——达尔文'人类源自非洲古猿'的预言被分子证据定量确认。演化生物学进入比较基因组学时代。", img:"https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d5/Unnamed_-_Chimpanzee_-_Central_African_Republic.jpg/500px-Unnamed_-_Chimpanzee_-_Central_African_Republic.jpg", wiki:"https://en.wikipedia.org/wiki/Chimpanzee_genome_project", wikiW:"https://en.wikipedia.org/wiki/Eric_Lander", wzh:"黑猩猩基因组计划"},
+ {y:2005, n:"光遗传学的诞生", w:"卡尔·戴塞尔罗斯 Karl Deisseroth / 爱德华·博伊登 Edward Boyden / 张锋 Feng Zhang", c:"fro", lv:1, side:1, img:"https://thumb.wikimedia.org/wikipedia/commons/thumb/6/65/2026-Nobel-Prize-Channelrhodopsin-Hegasy_Illustration.png/500px-2026-Nobel-Prize-Channelrhodopsin-Hegasy_Illustration.png", d:"把绿藻的光敏蛋白 Channelrhodopsin-2 转入神经元，用一束蓝光在毫秒级控制神经活动——'用光开关大脑'成为现实，2026 年获诺贝尔生理学或医学奖。神经科学从'观察大脑'迈入'操控大脑'。", wiki:"https://en.wikipedia.org/wiki/Optogenetics", wikiW:"https://en.wikipedia.org/wiki/Karl_Deisseroth", wzh:"光遗传学", g:`Deisseroth 是精神科医生出身——白天看病人、晚上在实验室想把'电路'直接装进大脑。最初的灵感来自绿藻：Nagel 2003 年发现 ChR2 是光门控通道，Deisseroth 的学生 Boyden 与张锋 2005 年第一次把它放进神经元。一篇论文，改变了整个神经科学的研究方式。`},
+{y:2010, n:"尼安德特人基因组", w:"斯万特·帕博 Svante Pääbo", c:"evo", lv:1, d:"从 4 万年化石骨头中提取古 DNA 测序：现代欧亚人群含 1-4% 尼安德特基因——不同人种曾杂交。古 DNA 学由此建立，帕博 2022 年获诺贝尔生理学或医学奖。", img:"https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Neanderthal.jpg/500px-Neanderthal.jpg", wiki:"https://en.wikipedia.org/wiki/Neanderthal_genome_project", wikiW:"https://en.wikipedia.org/wiki/Svante_P%C3%A4%C3%A4bo", wzh:"尼安德特人基因组计划", g:`帕博团队测序尼安德特人时，在西伯利亚一个山洞里随手测了一根指骨——结果发现一个全新人种'丹尼索瓦人'。一根指骨就是一个未知人种，古DNA领域的日常惊悚。`},
+{y:2012, n:"CRISPR 基因编辑", w:"詹妮弗·杜德娜 Jennifer Doudna / 埃玛纽埃勒·卡彭蒂耶 Emmanuelle Charpentier", c:"fro", lv:1, q:"能否主动改变遗传信息，检验基因与性状的因果？", qt:2, d:"把细菌的免疫系统改造成基因剪刀，可在任何基因组精确切割——2020 年诺贝尔化学奖。也带来深刻的伦理讨论（2018 年基因编辑婴儿事件）。", img:"https://thumb.wikimedia.org/wikipedia/commons/thumb/8/8d/4QYZ.png/500px-4QYZ.png", wiki:"https://en.wikipedia.org/wiki/CRISPR_gene_editing", wikiW:"https://en.wikipedia.org/wiki/Jennifer_Doudna", wikiW:"https://en.wikipedia.org/wiki/Jennifer_Doudna", wzh:"CRISPR基因编辑"},
+{y:2015, n:"eDNA 生物监测普及", w:"皮埃尔·塔贝莱 Pierre Taberlet 等", c:"div", lv:2, d:"从一杯河水/一撮土壤中提取环境 DNA 即可鉴定当地物种——生物多样性监测从'带枪进山'变为'取样测序'，保护生物学的方法革命。", img:"https://thumb.wikimedia.org/wikipedia/commons/thumb/d/de/Longhorn_beetle_Leptura_quadrifasciata.jpg/500px-Longhorn_beetle_Leptura_quadrifasciata.jpg", wiki:"https://en.wikipedia.org/wiki/Environmental_DNA", wikiW:"https://en.wikipedia.org/wiki/Pierre_Taberlet", wzh:"环境DNA"},
+{y:2020, n:"AlphaFold 破解折叠", w:"德米斯·哈萨比斯 Demis Hassabis / 约翰·朱默 John Jumper（DeepMind）", c:"fro", lv:1, q:"遗传序列怎样与蛋白质结构和功能相连？", qt:2, d:"AI 预测 2 亿+蛋白质结构达到实验精度——困扰生物学 50 年的难题被深度学习解决，2024 年诺贝尔化学奖。AI×生物学的里程碑。", img:"https://upload.wikimedia.org/wikipedia/commons/e/ee/T1044-alphafold3-layey-by-layer.gif", wiki:"https://en.wikipedia.org/wiki/AlphaFold", wikiW:"https://en.wikipedia.org/wiki/Demis_Hassabis", wzh:"AlphaFold"},
+{y:1993, n:"微RNA lin-4 的发现", w:"维克托·安布罗斯 Victor Ambros / 加里·鲁夫昆 Gary Ruvkun", c:"mol", lv:2, side:1, d:"在线虫中发现第一个微 RNA（lin-4）——不编码蛋白质的小 RNA 也能调控基因，开启转录后调控的全新层次。当时几乎无人理会，直到 2000 年 let-7 引爆全领域，2024 年获诺贝尔奖——一藏 31 年的诺奖。", img:"https://thumb.wikimedia.org/wikipedia/commons/thumb/9/95/MiRNA-biogenesis.jpg/500px-MiRNA-biogenesis.jpg", wiki:"https://en.wikipedia.org/wiki/MicroRNA", wikiW:"https://en.wikipedia.org/wiki/Victor_Ambros", wzh:"小分子RNA", g:`安布罗斯1993年发现lin-4时，几乎所有同行认为这是线虫的怪癖、不具普遍性——他因此在哈佛晋升受挫。鲁夫昆2000年发现第二个微RNA(let-7)才引爆全领域。两人从冷板凳到诺奖等了31年——比很多博士的整个职业生涯还长。`},
+{y:1995, n:"调节性 T 细胞的发现", w:"坂口志文 Shimon Sakaguchi / 布鲁科夫 Brunkow / 拉姆斯德尔 Ramsdell", c:"cell", lv:2, d:"鉴定出抑制免疫攻击的 CD25⁺调节性 T 细胞（2003 年 FOXP3 基因阐明其主控开关）——解释免疫系统为何不攻击自身，成为器官移植、自免病与肿瘤免疫的理论根基，2025 年获诺贝尔奖。", img:"https://thumb.wikimedia.org/wikipedia/commons/thumb/e/eb/Mechanisms_of_suppression_by_regulatory_T_cells.png/500px-Mechanisms_of_suppression_by_regulatory_T_cells.png", wiki:"https://en.wikipedia.org/wiki/Regulatory_T_cell", wikiW:"https://en.wikipedia.org/wiki/Shimon_Sakaguchi", wzh:"调节T细胞"},
+{y:2025, n:"首例定制基因编辑救活婴儿 KJ", w:"CHOP / 宾大医学团队", c:"fro", lv:1, side:1, d:"患致命代谢病（CPS1 缺陷）的男婴 KJ 接受史上首个'为单个病人、单个突变定制'的碱基编辑疗法——从基因组诊断到给药仅约 6 个月，Science 2025 年度突破提名。人类第一次'按需'修复生命密码：1953 读懂双螺旋 → 2012 拿到剪刀 → 2025 为一个孩子现场磨一把。", wiki:"https://www.nejm.org/doi/full/10.1056/NEJMoa2504747", wzh:"KJ·穆尔东", g:`治疗由 30 多名医生、科学家、伦理学家和 FDA 官员组成的'一人军队'完成；父母在孕期超声发现异常后仅 10 周内就完成了确诊。与 2018 年贺建奎的生殖系编辑对照：同一种剪刀，体细胞治疗救命 vs 生殖系改造越界——一念之差，一药一罪。`},
+{y:2026, n:"AlphaGenome 解读非编码基因组", w:"Google DeepMind", c:"fro", lv:1, d:"DeepMind 发布 AlphaGenome，能从长 DNA 序列预测基因变异的调控效应，第一次大规模解读占基因组 98% 的'暗物质'——非编码区。AI 读懂生命的下一章：2020 AlphaFold 读蛋白质结构，2026 AlphaGenome 读基因调控开关。", img:"https://thumb.wikimedia.org/wikipedia/commons/thumb/3/37/Difference_DNA_RNA-EN.svg/500px-Difference_DNA_RNA-EN.svg.png", wiki:"https://en.wikipedia.org/wiki/AlphaGenome", wikiW:"https://en.wikipedia.org/wiki/Google_DeepMind", wzh:"AlphaGenome"},
+ {y:2026, n:"RNA 聚合酶核酶自我复制", w:"贾尼 Gianni / 郭克 Kwok 等", c:"mol", lv:1, side:-1, d:"一个小的聚合酶核酶（ribozyme）能合成自己的互补链，也能合成自身拷贝——RNA 世界假说（生命起源第一步是能自我复制的 RNA）获得迄今最有力的实验支持。", wiki:"https://en.wikipedia.org/wiki/RNA_world", wikiW:"https://en.wikipedia.org/wiki/Ribozyme", wzh:"RNA世界假说", g:`生命起源的'先有鸡还是先有蛋'：DNA 需要蛋白质来复制，蛋白质需要 DNA 来编码——破解之道是假设最早的生命用 RNA 同时干这两件事。此前最大的障碍是'RNA 能催化复制吗'，2026 年这个核酶第一次做到自我复制，相当于在试管里看到了生命起源的影子。`},
 ];
 
 const CAT_COLOR = {cell:"var(--cell)", gen:"var(--genetics)", mol:"var(--molecule)",
@@ -211,7 +256,7 @@ const CAT_COLOR = {cell:"var(--cell)", gen:"var(--genetics)", mol:"var(--molecul
 const CAT_NAME  = {cell:"细胞篇", gen:"遗传与变异篇", mol:"分子与基因组", evo:"演化生物学",
                    div:"多样性与生态", fro:"前沿技术"};
 
-const T0 = 1650, T1 = 2035;         // 数据年份范围
+const T0 = 1850, T1 = 2035;         // 数据年份范围
 const PAD_L = 90, PAD_R = 130;      // 画布留白
 const W = 17000;                      // 画布宽（px）
 const x = y => PAD_L + (y - T0) / (T1 - T0) * (W - PAD_L - PAD_R);
@@ -219,7 +264,7 @@ const x = y => PAD_L + (y - T0) / (T1 - T0) * (W - PAD_L - PAD_R);
 const tl = document.getElementById("timeline");
 
 // 世纪/年代刻度
-for (let yr = 1660; yr <= 2030; yr += 20) {
+for (let yr = 1860; yr <= 2030; yr += 20) {
   const t = document.createElement("div");
   t.className = "tick"; t.style.left = x(yr) + "px";
   const l = document.createElement("div");
@@ -227,17 +272,7 @@ for (let yr = 1660; yr <= 2030; yr += 20) {
   tl.appendChild(t); tl.appendChild(l);
 }
 
-// 时代分区
-const ERAS = [
-  [1650, 1800, "1665–1897：看到细胞"], [1800, 1900, "19世纪：细胞学说与遗传定律"],
-  [1900, 1950, "1900–1950：染色体与基因"], [1950, 1975, "1950–1975：分子革命"],
-  [1975, 2005, "1975–2005：基因组时代"], [2005, 2035, "2005–2026：编辑、AI 与前沿"]];
-for (const [a, b, label] of ERAS) {
-  const e = document.createElement("div");
-  e.className = "era"; e.style.left = x(a) + "px";
-  if (x(b) - x(a) < 220) e.style.display = "none";
-  e.textContent = label; tl.appendChild(e);
-}
+// 时代分区（已移除，不再显示）
 
 // 事件密度谱：固定宽度导航条，每 20 年一格，点击某格缩放至该段
 (function density(){
@@ -246,8 +281,8 @@ for (const [a, b, label] of ERAS) {
   const maxD = Math.max(...Object.values(bins));
   window._density = { bins, maxD };   // 供高亮函数复用
   const di = document.getElementById("densityInner");
-  const Y0 = 1660, Y1 = 2040;   // 密度谱年份范围（首格起点 ~ 末格终点）
-  for (let b = 1660; b <= 2020; b += 20) {
+  const Y0 = 1850, Y1 = 2040;   // 密度谱年份范围（首格起点 ~ 末格终点）
+  for (let b = 1860; b <= 2020; b += 20) {
     const n = bins[b] || 0;
     const blk = document.createElement("div");
     blk.className = "bin";
@@ -272,7 +307,7 @@ for (const [a, b, label] of ERAS) {
 })();
 
 // 布局：两侧行分配器——按年份顺序，轮流试上侧/下侧，放入“行的右边界放得下”的最浅行
-const CARD_W = 210, GAP = 160;   // 卡宽与最小水平净间距（卡间不重叠）
+const CARD_W = 430, GAP = 160;   // 卡宽与最小水平净间距（卡间不重叠）
 const bounds = {1: [], "-1": []};  // side -> 每行右边界 px
 function tryPlace(px, side) {
   const rs = bounds[side];
@@ -299,7 +334,7 @@ for (const ev of placed) {
   const el = document.createElement("div");
   el.className = "event " + (ev.side > 0 ? "up" : "dn");
   el.style.left = x(ev.y) + "px";
-  el.style.top = "45%";
+  el.style.top = "52%";
   el.style.color = CAT_COLOR[ev.c];
   el.style.height = "0";           // 锚定中线，stem/card 绝对定位展开
 
@@ -323,14 +358,15 @@ for (const ev of placed) {
   } else {
     card.style.top = (stemLen + 6) + "px";
   }
-  card.innerHTML = `<div class="name">${ev.g ? "📖 " : ""}${ev.n}</div><div class="meta">${ev.w} · ${ev.y}</div>`;
-
+  card.innerHTML = `<div class="name">${ev.g ? "📖 " : ""}${ev.q ? (ev.qt===2 ? "🔭 " : "🧭 ") : ""}${ev.n}</div><div class="meta">${ev.w} · ${ev.y}</div>`;
   const det = document.createElement("div");
   det.className = "detail";
   det.style.display = "none";
-  det.innerHTML = `<h3>${ev.n}</h3><div class="who">${ev.w} · ${ev.y} · ${CAT_NAME[ev.c]}${ev.lv===1?" · 里程碑":""}</div><p>${ev.d}</p>` +
-    (ev.g ? `<div class="gossip"><div class="gtag">📖 一则八卦</div>${ev.g}</div>` : "") +
-    (ev.wiki ? `<div class="src">扩展阅读：<a href="${ev.wiki}" target="_blank" rel="noopener">Wikipedia</a></div>` : "");
+  det.innerHTML = `<h3>${ev.wiki ? `<a href="${ev.wiki}" target="_blank" rel="noopener">${ev.n}</a>` : ev.n}</h3><div class="who">${ev.wikiW ? `<a href="${ev.wikiW}" target="_blank" rel="noopener">${ev.w}</a>` : ev.w} · ${ev.y} · ${CAT_NAME[ev.c]}${ev.lv===1?" · 里程碑":""}</div>` +
+    (ev.q ? `<div class="darwinq ${ev.qt===2?'q2':''}"><span class="qtag">${ev.qt===2?"🔭 时空之旅新问：":"🧭 达尔文之问："}</span>${ev.q}</div>` : "") +
+    `<p>${ev.d}</p>` +
+    (ev.img ? `<img class="evimg" src="${ev.img}" alt="${ev.n}" loading="lazy" onerror="this.style.display='none'">` : "") +
+    (ev.g ? `<div class="gossip"><div class="gtag">📖 一则八卦</div>${ev.g}</div>` : "");
   // 详情卡初值：远离轴；渲染后统一做视口边界翻转
   if (ev.side > 0) {
     det.style.bottom = (stemLen + 70) + "px"; det.style.top = "auto";
@@ -340,6 +376,8 @@ for (const ev of placed) {
 
   el.dataset.lv = ev.lv;
   el.dataset.row = ev.row;
+  if (ev.q) el.dataset.q = "1";
+  if (ev.qt === 2) el.dataset.t = "1";
   el.append(stem, dot, card, det);
   tl.appendChild(el);
 }
@@ -374,6 +412,101 @@ for (const ev of placed) {
   });
 })();
 
+// ===== 筛选开关：只显示带"达尔文之问"的事件 =====
+const qBtn = document.getElementById("qFilterBtn");
+qBtn.addEventListener("click", () => {
+  document.body.classList.toggle("q-only");
+  const on = document.body.classList.contains("q-only");
+  qBtn.classList.toggle("active", on);
+  qBtn.textContent = on ? "🧭 达尔文之问：开" : "🧭 达尔文之问：关";
+});
+
+// ===== 导览模式：tour.sel 选择站点集合（达尔文之旅=带🧭的；时空之旅=全部事件）=====
+const tourBtn = document.getElementById("tourBtn");
+const allTourBtn = document.getElementById("allTourBtn");
+let tour = null;   // { i, timer, sel }
+const TOUR_STAY = 6000;   // 每站停留 ms
+
+function tourStop() {
+  if (tour) { clearTimeout(tour.timer); tour = null; }
+  tourBtn.classList.remove("active");
+  tourBtn.textContent = "▶ 达尔文之旅";
+  allTourBtn.classList.remove("active");
+  allTourBtn.textContent = "▶ 时空之旅";
+  if (window.hideTip) window.hideTip();
+}
+
+function tourStart(sel) {
+  if (tour) tourStop();
+  const btn = sel === '.event[data-q]' ? tourBtn : allTourBtn;
+  btn.classList.add("active");
+  btn.textContent = "⏸ 退出（←/→ 切换）";
+  tour = { i: -1, timer: 0, sel };
+  tourGoTo(0);
+}
+
+// 飞到事件并停留显示详情
+function tourGoTo(i) {
+  const els = [...document.querySelectorAll(tour ? tour.sel : '.event[data-q]')];
+  if (!els.length) return tourStop();
+  if (i >= els.length) return tourStop();   // 走完全程
+  tour = { i, timer: 0, sel: tour ? tour.sel : '.event[data-q]' };
+  const el = els[i];
+  const left = parseFloat(el.style.left);
+  const targetS = 0.9;
+  const targetTx = vp.clientWidth * 0.5 - left * targetS;
+  const targetTy = vp.clientHeight * 0.5 - (parseFloat(el.style.top) / 100 * vp.clientHeight) * targetS - 64 * targetS;
+  animateView(targetS, targetTx, targetTy, 1400);
+  // 动画结束后直接弹出详情卡：一次飞行直达事件，不再做二次居中修正
+  setTimeout(() => {
+    if (!tour) return;   // 途中被取消
+    const tip2 = document.getElementById('detailTip');
+    tip2.innerHTML = el.querySelector('.detail').innerHTML;
+    tip2.style.color = getComputedStyle(el).color;
+    tip2.style.display = 'block';
+    requestAnimationFrame(()=>tip2.classList.add('show'));
+    // 站点序号徽标
+    const badge = document.createElement('div');
+    const tname = tour.sel === '.event' ? "🚀 时空之旅" : "🧭 达尔文之旅";
+    badge.textContent = `${tname} · 第 ${i + 1} / ${els.length} 站`;
+    badge.style.cssText = 'font-weight:700;color:#4F7A3F;font-size:13px;margin-bottom:4px;';
+    tip2.insertBefore(badge, tip2.firstChild);
+    // 放在视口中固定的舒适位置（右上）
+    tip2.style.left = Math.max(12, vp.clientWidth - tip2.offsetWidth - 12) + 'px';
+    tip2.style.top = '12px';
+    tour.timer = setTimeout(() => {
+      if (!tour) return;
+      // 直接飞往下一站：详情卡保持显示，不回到全景
+      tourGoTo(i + 1);
+    }, TOUR_STAY);
+  }, 1450);
+}
+
+tourBtn.addEventListener("click", () => {
+  if (tour && tour.sel === '.event[data-q]') return tourStop();   // 再点一次=退出
+  tourStart('.event[data-q]');
+});
+allTourBtn.addEventListener("click", () => {
+  if (tour && tour.sel === '.event') return tourStop();
+  tourStart('.event');
+});
+
+// 键盘：← 上一站 / → 下一站（导览中生效）；Esc 退出
+document.addEventListener("keydown", e => {
+  if (!tour) return;
+  if (e.key === "ArrowRight") { e.preventDefault(); clearTimeout(tour.timer); window.hideTip(); tourGoTo(tour.i + 1); }
+  else if (e.key === "ArrowLeft") { e.preventDefault(); clearTimeout(tour.timer); window.hideTip(); tourGoTo(Math.max(0, tour.i - 1)); }
+  else if (e.key === "Escape") { tourStop(); }
+});
+
+// 用户任何手动操作（拖动/滚轮/点击密度条）都退出导览
+// （vp 在后文才声明，故延迟注册避免 TDZ 错误）
+window.addEventListener("load", () => {
+  ['mousedown', 'wheel', 'touchstart'].forEach(evt =>
+    vp.addEventListener(evt, () => { if (tour) tourStop(); }, { passive: true }));
+  document.getElementById('densityInner').addEventListener('click', () => { if (tour) tourStop(); });
+});
+
 // ===== 详情卡：钉住式 tooltip（悬停弹出后固定，可移入点击链接） =====
 (function tooltip(){
   const tip = document.createElement('div');
@@ -402,15 +535,16 @@ for (const ev of placed) {
       tip.innerHTML = ev.querySelector('.detail').innerHTML;
       tip.style.color = getComputedStyle(ev).color;
       tip.style.display = 'block';
+      requestAnimationFrame(()=>tip.classList.add('show'));
       place(e, ev);
     } else if (!tip.contains(e.target)) {
       // 移到别处（非当前事件、非 tip 内）→ 关闭
-      tip.style.display = 'none';
+      tip.style.display = 'none'; tip.classList.remove('show');
       activeEv = null;
     }
   });
   // 拖动平移时关闭 tip，避免停在旧位置
-  window.hideTip = () => { tip.style.display = 'none'; activeEv = null; };
+  window.hideTip = () => { tip.style.display = 'none'; tip.classList.remove('show'); activeEv = null; };
 })();
 
 // ===== 交互：地图式缩放（先全景 → 滚轮 zoom → 拖动平移）=====
@@ -429,7 +563,7 @@ function apply(){
 // 更新可视区间与事件数量统计
 function updateStats(){
   const [y0, y1] = currentYears();
-  const y0c = Math.max(1665, Math.round(y0));
+  const y0c = Math.max(1859, Math.round(y0));
   const y1c = Math.min(2026, Math.round(y1));
   const cnt = EVENTS.filter(ev => ev.y >= y0 && ev.y <= y1).length;
   const st = document.getElementById('viewStats');
@@ -471,7 +605,7 @@ function zoomToEra(b){
   const targetS = clamp((vp.clientWidth * 0.62) / w20, minScale, 3.5);
   const yc = b + 10;
   const targetTx = vp.clientWidth / 2 - x(yc) * targetS;
-  const targetTy = vp.clientHeight * 0.5 - vp.clientHeight * 0.45 * targetS;
+  const targetTy = vp.clientHeight * 0.5 - vp.clientHeight * 0.52 * targetS - 64 * targetS;
   animateView(targetS, targetTx, targetTy);
 }
 
@@ -495,13 +629,13 @@ function animateView(ts, ttx, tty, dur = 700){
   animId = requestAnimationFrame(step);
 }
 
-// 初始/重置：全景视图（横向 fit 全部 1665–2026）
+// 初始/重置：全景视图（横向 fit 全部 1859–2026）
 function fitToView(){
   const pad = 40, vw = vp.clientWidth, vh = vp.clientHeight;
   minScale = Math.max(0.02, (vw - pad * 2) / W);
   view.s = minScale;
   view.tx = pad;
-  view.ty = vh * 0.5 - vh * 0.45 * view.s;   // 主轴(45%)落在视口垂直中心
+  view.ty = vh * 0.5 - vh * 0.52 * view.s - 64 * view.s;   // 主轴(52%)落在视口垂直中心
   apply();
 }
 fitToView();
