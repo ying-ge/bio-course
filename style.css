@@ -13,6 +13,27 @@ main {
   padding: 48px 20px 60px;
 }
 
+/* 主页右上角资源链接（index.html 已改用 home.css，此段保留作参考） */
+#topbar {
+  position: fixed;
+  top: 16px;
+  right: 20px;
+  z-index: 10;
+  display: flex;
+  gap: 10px;
+}
+#topbar a {
+  padding: 5px 14px;
+  font-size: .88rem;
+  color: #2c6e9e;
+  background: #fff;
+  border: 1px solid #dce4ea;
+  border-radius: 18px;
+  text-decoration: none;
+  box-shadow: 0 1px 4px rgba(0,0,0,.06);
+}
+#topbar a:hover { background: #eef4f8; }
+
 /* 书目条目 */
 .item {
   background: #fff;

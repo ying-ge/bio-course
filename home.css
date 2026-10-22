@@ -1,0 +1,190 @@
+/* ============================================================
+   主页样式 —— 深时 / 生命长河主题（仅 index.html 使用）
+   books.html 仍使用 style.css
+   ============================================================ */
+
+:root {
+  --deep: #06121f;        /* 深时之底 */
+  --deep2: #0a1f30;
+  --ink: #dce8ef;
+  --ink-dim: #7f97a6;
+  --cyan: #4fd1c5;        /* 现代生命科学 */
+  --amber: #d9a441;       /* 化石 / 深时 */
+  --card: rgba(13, 34, 50, .72);
+  --line: rgba(79, 209, 197, .25);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Segoe UI", sans-serif;
+  color: var(--ink);
+  line-height: 1.85;
+  min-height: 100vh;
+  background:
+    radial-gradient(1100px 500px at 85% -10%, rgba(79,209,197,.14), transparent 60%),
+    radial-gradient(900px 500px at -10% 30%, rgba(217,164,65,.07), transparent 55%),
+    linear-gradient(175deg, var(--deep2) 0%, var(--deep) 55%, #040d16 100%);
+  background-attachment: fixed;
+}
+
+/* ---- 右上角资源链接 ---- */
+#topbar {
+  position: fixed;
+  top: 18px;
+  right: 22px;
+  z-index: 10;
+  display: flex;
+  gap: 10px;
+}
+#topbar a {
+  padding: 6px 16px;
+  font-size: .86rem;
+  letter-spacing: .04em;
+  color: var(--cyan);
+  background: rgba(10, 31, 48, .8);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  text-decoration: none;
+  backdrop-filter: blur(6px);
+  transition: all .2s ease;
+}
+#topbar a:hover {
+  background: rgba(79,209,197,.16);
+  border-color: var(--cyan);
+}
+
+main {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 88px 22px 90px;
+}
+
+/* ---- 页头：生命长河 ---- */
+#hero { margin-bottom: 64px; }
+#hero .kicker {
+  font-size: .82rem;
+  letter-spacing: .45em;
+  color: var(--amber);
+  margin-bottom: 10px;
+}
+#hero h1 {
+  font-size: clamp(2rem, 5vw, 2.9rem);
+  font-weight: 700;
+  letter-spacing: .06em;
+}
+#hero h1 em {
+  font-style: normal;
+  color: var(--cyan);
+}
+#hero .sub {
+  margin-top: 14px;
+  max-width: 34em;
+  color: var(--ink-dim);
+  font-size: .95rem;
+}
+/* 长河：一条自左向右流淌的光带 */
+#hero .river {
+  margin-top: 26px;
+  height: 2px;
+  background: linear-gradient(90deg,
+    transparent, rgba(217,164,65,.7) 15%,
+    var(--cyan) 55%, rgba(79,209,197,.15) 85%, transparent);
+  position: relative;
+  overflow: visible;
+}
+#hero .river::after {
+  content: "";
+  position: absolute;
+  right: -3px; top: -3px;
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--cyan);
+  box-shadow: 0 0 12px 2px rgba(79,209,197,.65);
+}
+
+/* ---- 课程列表：时间轴 ---- */
+.group-title {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  font-size: 1.05rem;
+  letter-spacing: .3em;
+  color: var(--amber);
+  margin-bottom: 26px;
+}
+.group-title::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(217,164,65,.5), transparent);
+}
+
+#lessons { position: relative; }
+/* 地质年代轴：贯穿所有课次的竖线 */
+#lessons::before {
+  content: "";
+  position: absolute;
+  left: 9px; top: 6px; bottom: 6px;
+  width: 2px;
+  background: linear-gradient(180deg,
+    var(--cyan), rgba(79,209,197,.15) 70%, transparent);
+}
+
+.item {
+  position: relative;
+  background: var(--card);
+  border: 1px solid rgba(127,151,166,.16);
+  border-radius: 14px;
+  padding: 20px 26px 20px 40px;
+  margin: 0 0 18px 30px;
+  backdrop-filter: blur(4px);
+  transition: border-color .2s ease, transform .2s ease, background .2s ease;
+}
+/* 轴上的节点：每一次课都是长河中的一个坐标 */
+.item::before {
+  content: "";
+  position: absolute;
+  left: -27px; top: 30px;
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: var(--deep);
+  border: 2px solid var(--cyan);
+  box-shadow: 0 0 8px rgba(79,209,197,.5);
+}
+.item:hover {
+  border-color: rgba(79,209,197,.45);
+  background: rgba(16, 42, 62, .85);
+  transform: translateX(4px);
+}
+.item .row { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.item a {
+  color: var(--ink);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1.06rem;
+  letter-spacing: .02em;
+}
+.item a:hover { color: var(--cyan); }
+.item a small {
+  font-weight: normal;
+  font-size: .78rem;
+  letter-spacing: .08em;
+  color: var(--ink-dim);
+  margin-left: 6px;
+}
+
+/* ---- 页脚 ---- */
+#colophon {
+  margin-top: 56px;
+  text-align: center;
+  font-size: .8rem;
+  letter-spacing: .12em;
+  color: rgba(127,151,166,.55);
+}
+
+@media (max-width: 600px) {
+  #topbar { position: static; justify-content: flex-start; margin-bottom: 20px; }
+  main { padding-top: 40px; }
+  .item { padding-left: 34px; margin-left: 24px; }
+}

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>普通生物学 · 生命的长河</title>
+<link rel="stylesheet" href="home.css">
+</head>
+<body>
+
+<header id="topbar">
+  <a href="timeline.html">时间线</a>
+  <a href="books.html">参考书</a>
+</header>
+
+<main id="list">
+  <div id="hero">
+    <p class="kicker">普通生物学 · 2026 秋</p>
+    <h1>生命的长河<em>，四十亿年</em></h1>
+    <p class="sub">从达尔文的疑问到基因组时代的解答——我们将沿演化之河顺流而下，在每一次课上停靠一个坐标。</p>
+    <div class="river"></div>
+  </div>
+  <div id="lessons"></div>
+  <p id="colophon">演化没有终点，课程也是</p>
+</main>
+
+<script src="lessons.js"></script>
+<script>
+/* 根据 lessons.js 生成课程列表 */
+(function () {
+  const box = document.getElementById("lessons");
+  if (typeof LESSONS === "undefined" || !box) return;
+  const h = document.createElement("h2");
+  h.className = "group-title";
+  h.textContent = "课程安排";
+  box.appendChild(h);
+  LESSONS.forEach(l => {
+    const div = document.createElement("div");
+    div.className = "item";
+    const row = document.createElement("div");
+    row.className = "row";
+    const a = document.createElement("a");
+    a.href = l.url;
+    a.textContent = l.title;
+    const tag = document.createElement("small");
+    tag.textContent = l.date;
+    a.appendChild(tag);
+    row.appendChild(a);
+    div.appendChild(row);
+    box.appendChild(div);
+  });
+})();
+</script>
+</body>
+</html>
