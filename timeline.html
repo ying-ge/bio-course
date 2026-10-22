@@ -53,7 +53,7 @@
                 box-shadow: 0 2px 8px rgba(0,0,0,.12); }
   #allTourBtn:hover { background: #efede8; }
   #allTourBtn.active { background: #2A6F97; border-color: #2A6F97; color: #fff; font-weight: 700; }
-  #dvPanel { position: fixed; left: 20px; top: 122px; z-index: 59; width: 430px; max-height: 55vh;
+  #dvPanel { position: fixed; left: 20px; top: 122px; bottom: 20px; z-index: 59; width: 430px;
              overflow-y: auto; background: #fff; border: 1px solid #C6D8BC; border-radius: 10px;
              box-shadow: 0 8px 28px rgba(0,0,0,.16); padding: 14px 16px; display: none; }
   #dvPanel.open { display: block; }
@@ -582,8 +582,9 @@ allTourBtn.addEventListener("click", () => {
   tourStart('.event', allTourBtn, "🚀 全景漫游");
 });
 // —— 站点清单面板 ——
-document.getElementById('dvLegendLink').addEventListener("click", () => {
+document.getElementById('dvLegendLink').addEventListener("click", (e) => {
   const panel = document.getElementById('dvPanel');
+  e.stopPropagation();
   panel.classList.toggle('open');
   if (open && !panel.dataset.built) {
     const tbody = document.getElementById('dvRows');
@@ -614,6 +615,20 @@ document.getElementById('dvLegendLink').addEventListener("click", () => {
       });
     });
     panel.dataset.built = "1";
+  }
+});
+// 点击其他位置：关闭站点清单面板与详情卡（点击面板条目/详情卡内部除外）
+document.addEventListener("click", (e) => {
+  const panel = document.getElementById('dvPanel');
+  const tip = document.getElementById('detailTip');
+  const legend = document.getElementById('dvLegendLink');
+  // 关闭详情卡：点击详情卡内部或面板条目（条目会打开详情卡）时保留
+  if (tip && tip.style.display !== 'none' && !tip.contains(e.target) && !panel.contains(e.target)) {
+    if (window.hideTip) window.hideTip();
+  }
+  // 关闭面板
+  if (panel.classList.contains('open') && !panel.contains(e.target) && !legend.contains(e.target)) {
+    panel.classList.remove('open');
   }
 });
 lifeTourBtn.addEventListener("click", () => {
