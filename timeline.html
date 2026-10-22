@@ -636,12 +636,18 @@ lifeTourBtn.addEventListener("click", () => {
   tourStart('.event[data-life]', lifeTourBtn, "🕯️ 达尔文的一生");
 });
 
-// 键盘：← 上一站 / → 下一站（导览中生效）；Esc 退出
+// 键盘：← 上一站 / → 下一站（导览中生效）；Esc 退出（导览 / 详情卡 / 站点清单面板）
 document.addEventListener("keydown", e => {
+  if (e.key === "Escape") {
+    if (tour) tourStop();
+    if (window.hideTip) window.hideTip();
+    const panel = document.getElementById('dvPanel');
+    if (panel) panel.classList.remove('open');
+    return;
+  }
   if (!tour) return;
   if (e.key === "ArrowRight") { e.preventDefault(); clearTimeout(tour.timer); window.hideTip(); tourGoTo(tour.i + 1); }
   else if (e.key === "ArrowLeft") { e.preventDefault(); clearTimeout(tour.timer); window.hideTip(); tourGoTo(Math.max(0, tour.i - 1)); }
-  else if (e.key === "Escape") { tourStop(); }
 });
 
 // 用户任何手动操作（拖动/滚轮/点击密度条）都退出导览
