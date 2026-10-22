@@ -1,7 +1,7 @@
 # 课程资料中心（静态网页）
 
 给本科生发布的课程资料下载页。无需服务器：任意静态托管（学校主页空间、
-GitHub Pages、Gitee Pages）上传整个 `course-site/` 文件夹即可使用。
+GitHub Pages、Gitee Pages）上传整个 `bio-course/` 文件夹即可使用。
 
 ## 老师日常使用（只需两步）
 
@@ -20,7 +20,9 @@ GitHub Pages、Gitee Pages）上传整个 `course-site/` 文件夹即可使用�
 
 | 文件 | 作用 |
 |---|---|
-| `index.html` | 页面结构（一般不用改） |
+| `index.html` | 主页（入口导航，一般不用改） |
+| `timeline.html` | 生物学发现时间线交互页面 |
+| `books.html` | 参考书下载页页面结构（一般不用改） |
 | `style.css` | 样式（悬停放大、响应式） |
 | `script.js` | 自动生成筛选按钮、大图、缩略图网格（一般不用改） |
 | `files.js` | **资料登记表（老师只改这个）** |
