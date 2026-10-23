@@ -1,6 +1,6 @@
 /* 根据 files.js 的记录生成书目卡片列表 */
 
-const MATERIALS = "materials/";
+const MATERIALS = "../materials/";
 
 function hrefOf(f) {
   return f.type === "link" ? f.file : MATERIALS + f.file;

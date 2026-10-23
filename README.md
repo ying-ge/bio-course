@@ -3,27 +3,49 @@
 给本科生发布的课程资料下载页。无需服务器：任意静态托管（学校主页空间、
 GitHub Pages、Gitee Pages）上传整个 `bio-course/` 文件夹即可使用。
 
-## 老师日常使用（只需两步）
+## 目录结构
 
-1. 把要发布的文件（PDF / PPT / DOC / 图片 / 压缩包）放入 `materials/` 文件夹。
-2. 打开 `files.js`，照注释里的格式添加一条记录（课次、标题、文件名、简介）。
+```
+bio-course/
+├── index.html        主页（课程列表入口，一般不用改）
+├── pages/            独立页面
+│   ├── timeline.html     生物学发现时间线
+│   └── books.html        参考书下载页
+├── lessons/          每次课一个文件夹（网页 + 该课自己的素材）
+│   └── 生物演化1/        示例：index.html + assets/
+├── assets/           公共资源（样式、脚本、公共图片）
+│   ├── home.css / style.css
+│   ├── lessons.js / files.js / script.js
+│   └── images/           时间线等页面用的图片
+└── materials/        参考书电子书文件（epub / pdf）
+```
 
-刷新网页即可看到新资料。示例记录是演示用的，请替换为真实资料。
+## 新增一次课（两步）
 
-## 页面功能
+1. 在 `lessons/` 下新建一个文件夹（如 `lessons/生物演化2/`），
+   把该课的网页放进去并命名为 `index.html`，图片等素材放在同一文件夹内。
+2. 打开 `assets/lessons.js`，照注释格式加一条记录
+   （date、title、url 填文件夹路径，如 `lessons/生物演化2/`）。
 
-- 按「课次 / 参考书 / 扩展阅读」分组的资料列表；
-- 每条资料显示名称、简介和文件名；
-- **点击资料名称即下载该文件**（外部链接类则在新标签打开）。
+刷新主页即可看到新课。
 
-## 文件清单
+## 新增参考书（两步）
+
+1. 把 epub / pdf 文件放入 `materials/` 文件夹。
+2. 打开 `assets/files.js`，照注释格式添加一条记录（标题、文件名、简介）。
+
+刷新 `pages/books.html` 即可看到。
+
+## 文件说明
 
 | 文件 | 作用 |
 |---|---|
 | `index.html` | 主页（入口导航，一般不用改） |
-| `timeline.html` | 生物学发现时间线交互页面 |
-| `books.html` | 参考书下载页页面结构（一般不用改） |
-| `style.css` | 样式（悬停放大、响应式） |
-| `script.js` | 自动生成筛选按钮、大图、缩略图网格（一般不用改） |
-| `files.js` | **资料登记表（老师只改这个）** |
-| `materials/` | 存放课件、习题等实际文件 |
+| `pages/timeline.html` | 生物学发现时间线交互页面 |
+| `pages/books.html` | 参考书下载页（一般不用改） |
+| `assets/lessons.js` | **课程登记表（加课时只改这个）** |
+| `assets/files.js` | **参考书登记表（加书时只改这个）** |
+| `assets/script.js` | 自动生成书目卡片（一般不用改） |
+| `assets/home.css`、`assets/style.css` | 样式 |
+| `lessons/` | 每次课一个文件夹，互不影响 |
+| `materials/` | 存放参考书等实际文件 |
