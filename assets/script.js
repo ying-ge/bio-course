@@ -44,5 +44,12 @@ COURSE_FILES.forEach(f => {
     p.textContent = f.desc;
     div.appendChild(p);
   }
+
+  if (f.level) {
+    const lv = document.createElement("span");
+    lv.className = "level-badge";
+    lv.textContent = `英语难度 CEFR ${f.level}`;
+    div.appendChild(lv);
+  }
   box.appendChild(div);
 });

@@ -7,7 +7,6 @@
 
 const LESSONS = [
   { date: "2026-11-17", title: "生物演化1", url: "lessons/生物演化1/" },
-  { date: "2026-11-17", title: "小组采访", url: "lessons/小组采访/" },
   { date: "2026-11-23", title: "生物演化2", url: "lessons/生物演化2/" },
   { date: "2026-11-24", title: "原核生物多样性，病毒，真核生物起源与原生生物多样性", url: "lessons/原核病毒原生生物/" },
   { date: "2026-11-30", title: "绿色植物多样性，真菌多样性", url: "lessons/植物真菌多样性/" },

@@ -1,0 +1,42 @@
+:root{--bg:#fbfaf6;--fg:#1f2430;--mut:#6b7280;--ac:#9a3412;--card:#f1ede3;--bd:#ded8c8;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#16181d;--fg:#e8e6df;--mut:#9aa0ab;--ac:#f59e6b;--card:#20232a;--bd:#33373f;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#16181d;--fg:#e8e6df;--mut:#9aa0ab;--ac:#f59e6b;--card:#20232a;--bd:#33373f;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:17px/1.75 "PingFang SC","Microsoft YaHei",system-ui,sans-serif}
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;display:flex;gap:.8rem;align-items:center;justify-content:space-between;padding:.5rem 1rem;background:var(--bg);border-bottom:1px solid var(--bd);font-size:14px;color:var(--mut)}
+button{font:inherit;background:var(--card);color:var(--fg);border:1px solid var(--bd);border-radius:8px;padding:.25rem .8rem;cursor:pointer}
+main{max-width:860px;margin:0 auto;padding:0 1.2rem}
+section{padding:2.5rem 0;border-bottom:1px solid var(--bd)}
+h1,h2{line-height:1.3;margin:.2rem 0 1rem}h2{font-size:1.6em}
+.tag{display:inline-block;font-size:.75em;padding:.05rem .7rem;border-radius:99px;border:1px solid var(--ac);color:var(--ac);margin-right:.5rem}
+.min{font-size:.8em;color:var(--mut)}
+.ask{margin:1rem 0;padding:.7rem 1rem;border-left:4px solid var(--ac);background:var(--card);border-radius:0 8px 8px 0}
+table{border-collapse:collapse;width:100%;font-size:.92em;display:block;overflow-x:auto}
+th,td{border:1px solid var(--bd);padding:.4rem .7rem;text-align:left;vertical-align:top}th{background:var(--card)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:.8rem}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:.7rem 1rem}
+.ext{margin:1rem 0;border:1px dashed var(--bd);border-radius:8px;padding:.4rem 1rem;color:var(--mut)}
+.ext summary{cursor:pointer;color:var(--ac)}
+body.slide{font-size:clamp(20px,3.2vw,36px);overflow:hidden}
+body.slide main{max-width:1100px}
+@media (max-aspect-ratio:4/3){body.slide main{max-width:min(1100px,calc((100vh - 3.2rem)*4/3))}}
+:fullscreen header{display:none}
+:fullscreen main{max-width:100%}
+body.slide:fullscreen section{min-height:100vh;padding:1rem 0}
+body.slide section{display:none;min-height:calc(100vh - 3.2rem);border:0;flex-direction:column;justify-content:center}
+body.slide section.on{display:flex}
+body.slide .ext{display:none}
+body.slide .rd{display:none}
+body.slide table{font-size:.72em;line-height:1.5}
+mark{background:linear-gradient(104deg,rgba(255,228,88,0) .5%,rgba(255,228,88,.75) 3%,rgba(255,228,88,.62) 97%,rgba(255,228,88,0) 99.5%);color:inherit;padding:.02em .1em;border-radius:.2em}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) mark{background:linear-gradient(104deg,rgba(163,138,0,0) .5%,rgba(163,138,0,.65) 3%,rgba(163,138,0,.5) 97%,rgba(163,138,0,0) 99.5%);color:#f5f0c0}}
+:root[data-theme="dark"] mark{background:linear-gradient(104deg,rgba(163,138,0,0) .5%,rgba(163,138,0,.65) 3%,rgba(163,138,0,.5) 97%,rgba(163,138,0,0) 99.5%);color:#f5f0c0}
+
+/* 灯箱 */
+#lb{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:99;align-items:center;justify-content:center;cursor:zoom-out}
+#lb.on{display:flex}
+#lb img{max-width:94vw;max-height:94vh;box-shadow:0 0 30px rgba(0,0,0,.6)}
+#lb button{position:fixed;top:50%;transform:translateY(-50%);z-index:100;background:rgba(0,0,0,.4);color:#fff;border:none;font-size:3em;line-height:1;width:1.2em;height:1.6em;border-radius:.2em;cursor:pointer;touch-action:manipulation}
+#lb button:hover{background:rgba(0,0,0,.7)}
+#lbp{left:1vw}#lbn2{right:1vw}
+#lb img{touch-action:pinch-zoom;-webkit-user-select:none;user-select:none}

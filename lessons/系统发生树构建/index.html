@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>普通生物学 · 实验一：系统发生树的构建</title>
+<link rel="stylesheet" href="../../assets/lecture.css"></head>
+<body class="slide">
+<header><span id="pos"></span><span><button id="tg">切换：课后阅读模式</button> <button id="th">明/暗</button></span></header>
+<main>
+
+<section><h1>普通生物学 · 实验一<br>系统发生树的构建</h1>
+<p>4学时（两环节各）｜手工建树 → AI 辅助复现前沿论文的系统发生树</p>
+<p class="min">←/→ 键翻页；右上角可切换为可下拉阅读的课后版</p></section>
+
+<section><span class="min">第一环节 · 导入</span><h2>实验目的：从手写到智能</h2>
+<div class="grid"><div class="card"><b>知识</b><br>记忆树的要素与建树原理；理解形态与分子两类证据</div><div class="card"><b>能力</b><br>观察记录、特征编码、手工建树；AI 检索序列并用 R 复现论文的树</div><div class="card"><b>方法训练</b><br>“手工原理—前沿文献—计算复现”完整闭环</div></div>
+<div class="ask">上一讲达尔文在笔记本上画下第一棵生命树。今天，我们自己动手画一棵，再用分子数据算一棵——两棵树会一样吗？</div></section>
+
+<section><span class="tag">原理</span><h2>一棵树有哪些零件？</h2>
+<div class="grid"><div class="card"><b>根与节点</b><br>根＝共同祖先；节点＝一次物种分化事件</div><div class="card"><b>分支与外群</b><br>分支长度可示变化量；外群用来给树“定方向”</div><div class="card"><b>共祖近度</b><br>谁和谁的共同祖先更近，谁就更近</div></div>
+<div class="ask">“鸟和蝙蝠都会飞”，能说明它们共同祖先更近吗？——相似有两种来源：共同祖先与趋同。</div>
+<details class="ext"><summary>扩展：建树三步原理</summary>① 特征选取（形态性状或 DNA/蛋白序列）；② 相似性度量（两两比较）；③ 聚类推断（相似者最近原则逐步合并）。手工与软件，走的都是同一条原理链。</details></section>
+
+<section><span class="tag">步骤一</span><h2>表型观察与记录</h2>
+<p>分组观察动植物实物/标本/高清图片，用笔在纸上逐项记录可比较的表型特征：脊椎有无、附肢类型、体表覆盖物、叶形/叶脉/花部结构……</p>
+<div class="ask">什么叫“可比较”？记录的是特征，还是印象？——好的记录让别人也能照着核对。</div>
+<details class="ext"><summary>扩展：像老一辈系统发生学家那样工作</summary>前计算机时代，分类学家靠标本、卡片和一笔一画的比较建立类群关系。亲手记录一次，才知道“数据”从何而来。</details></section>
+
+<section><span class="tag">步骤二</span><h2>特征编码与相似性计算</h2>
+<table><tr><th>步骤</th><th>做法</th></tr>
+<tr><td>① 编矩阵</td><td>整理为“物种 × 特征”0/1 状态矩阵</td></tr>
+<tr><td>② 算相似度</td><td>手工计算两两物种的相似比例</td></tr>
+<tr><td>③ 聚类</td><td>按最近原则逐步合并，先合最相似的一对</td></tr></table>
+<div class="ask">编码时怎样避免把“趋同相似”当成共同祖先的证据？（同源性判断是本实验难点）</div></section>
+
+<section><span class="tag">步骤三</span><h2>手工绘制系统发生树</h2>
+<div class="grid"><div class="card"><b>画树</b><br>在纸上绘制树状图，标注节点与共祖近度</div><div class="card"><b>互评</b><br>小组交换，检查聚类逻辑与绘图规范</div></div>
+<div class="ask">不同小组选的特征不同，画出的树会相同吗？特征选取如何决定树的拓扑？</div>
+<details class="ext"><summary>扩展：第一环节收工检查</summary>原始记录纸＋特征矩阵＋手工树，都要保留上交——它们是实验报告“互证反思”的证据。</details></section>
+
+<section><span class="tag">数据</span><span class="min">第二环节 · 论文导读</span><h2>要复现的论文：王佳伟课题组 2024 · Cell</h2>
+<p>Zhai D#, Zhang LY# 等 &amp; Wang JW*. <i>Reciprocal conversion between annual and polycarpic perennial flowering behavior in the Brassicaceae.</i> Cell 187(13): 3319–3337（2024-05-28，DOI: 10.1016/j.cell.2024.04.047）</p>
+<div class="grid"><div class="card"><b>科学问题</b><br>十字花科一年生与多年生开花行为如何相互转换</div><div class="card"><b>树的作用</b><br>系统发生树为该转换的演化分析提供物种亲缘框架</div><div class="card"><b>数据来源</b><br>论文补充材料及 ENA/NCBI 公共数据库（登录号以论文“数据可用性”声明为准）</div></div>
+<div class="ask">论文没有随文公开建树代码——复现要靠我们自己用 R（ape/phangorn）实现。原图与补充材料是核对拓扑的唯一标准。</div></section>
+
+<section><span class="tag">数据</span><span class="tag">演示</span><h2>AI agent 获取序列：流程与核实</h2>
+<table><tr><th>步骤</th><th>要点</th></tr>
+<tr><td>① 检索</td><td>用 AI 智能体定位论文、图中系统发生树及序列来源</td></tr>
+<tr><td>② 下载</td><td>从补充材料/ENA/NCBI 获取建树所用序列</td></tr>
+<tr><td>③ 核实</td><td>序列清单逐条与论文补充材料核对，防 AI 幻觉</td></tr></table>
+<div class="ask">AI 说“这是论文用的序列”，你信吗？——以原文清单为准，核对一致才可用。</div>
+<details class="ext"><summary>扩展：课堂核实纪律</summary>所有 AI 给出的论文信息与序列清单，必须回到论文原文/补充材料核对后方可使用。AI 提供效率，科学判断权在人。</details></section>
+
+<section><span class="tag">步骤四</span><h2>计算建树与复现</h2>
+<div class="grid"><div class="card"><b>建树</b><br>用 R（ape/phangorn）对序列建树</div><div class="card"><b>复现</b><br>对照论文方法（序列、外群、模型参数）</div><div class="card"><b>导出</b><br>导出树图，准备并排对照</div></div>
+<details class="ext"><summary>扩展：无网络备用方案</summary>机房提前实测 R 环境与网络；断网时使用本地序列文件＋本地建树脚本。</details></section>
+
+<section><span class="tag">对照</span><h2>对照与总结：两棵树说了什么？</h2>
+<p>把复现树与论文原图并排对照，分析拓扑异同及可能原因：方法参数、序列版本、外群选择。</p>
+<div class="ask">手工表型树与分子序列树哪里一致、哪里不同？为什么？——回顾“手工原理—分子数据—计算结果”这条方法链。</div></section>
+
+<section><h2>实验报告要求</h2>
+<table><tr><th>成绩构成</th><th>标准</th><th>占比</th></tr>
+<tr><td>过程表现</td><td>观察记录、计算、绘树的参与度与规范性</td><td>20%</td></tr>
+<tr><td>手工建树</td><td>矩阵编码合理；相似度计算正确；树结构规范</td><td>25%</td></tr>
+<tr><td>复现结果</td><td>序列清单核对一致；建树正确；对照分析到位</td><td>30%</td></tr>
+<tr><td>实验报告</td><td>结构完整（目的—原理—过程—结果—讨论）；手工树与复现树互证反思</td><td>25%</td></tr></table>
+<div class="ask">提交物：原始记录纸、特征矩阵与手工树、序列清单核对表、复现树图、实验报告。</div></section>
+
+<section><h2>思考题与预告</h2>
+<div class="ask"><b>思考：</b>① 你选的表型特征里哪些可能是趋同相似？② 手工树与复现树拓扑异同及原因？③ AI 出过错吗，你怎么发现的？④ 论文为什么选这些物种/基因？外群起什么作用？</div>
+<details class="ext" open><summary>扩展阅读</summary>Zhai et al. &amp; Wang JW*, Cell 187(13): 3319–3337 (2024)，DOI: 10.1016/j.cell.2024.04.047；课程讲义“生物演化”“生物多样性的演化”单元。</details>
+<p>下次实验：实验二 · 生物演化前沿案例探究（2学时）。</p></section>
+
+</main>
+<script src="../../assets/lecture.js"></script></body></html>
